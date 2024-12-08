@@ -1,0 +1,26 @@
+.container-fluid,
+.container{
+  padding-left: map-get($container-paddings-x, 'sm');
+  padding-right: map-get($container-paddings-x, 'sm');
+}
+
+@include media-breakpoint-up(md) {
+  .container-fluid,
+  .container{
+    padding-left: map-get($container-paddings-x, 'md');
+    padding-right: map-get($container-paddings-x, 'md');
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .container-fluid,
+  .container{
+    padding-left: map-get($container-paddings-x, 'lg');
+    padding-right: map-get($container-paddings-x, 'lg');
+    max-width: 1210px;
+  }
+
+  .container{
+    max-width: map-get($container-max-widths, 'lg');
+  }
+}

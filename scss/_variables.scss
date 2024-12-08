@@ -1,0 +1,28 @@
+// Grid breakpoints
+//
+// Define the minimum dimensions at which your layout will change,
+// adapting to different screen sizes, for use in media queries.
+
+$grid-breakpoints: (
+  xs: 0,
+  sm: 375px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1440px,
+  xxl: 1920px
+) !default;
+
+$container-max-widths: (
+  sm: 540px,
+  md: 768px,
+  lg: 1400px
+) !default;
+
+$container-paddings-x: (
+  sm: 15px,
+  md: 35px,
+  lg: 45px
+) !default;
+
+// Colors.
+$white: #ffffff !default;

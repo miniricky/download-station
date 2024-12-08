@@ -1,0 +1,7 @@
+/node_modules
+/index.html
+/css
+/js
+package-lock.json
+.DS_Store
+w3cErrors

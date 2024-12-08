@@ -1,0 +1,38 @@
+{
+  "name": "web-template",
+  "version": "1.0.0",
+  "description": "A bootstrap5 starter web template",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:miniricky/web-template.git"
+  },
+  "author": "Miniricky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/miniricky/web-template/issues"
+  },
+  "homepage": "https://github.com/miniricky/web-template#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "gulp": "^5.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-html-beautify": "^1.0.1",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-remove-sourcemaps": "^1.0.5",
+    "gulp-rename": "^2.0.0",
+    "gulp-sass": "^5.1.0",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-twig": "^1.2.0",
+    "gulp-uglify": "^3.0.2",
+    "gulp-util": "^3.0.8",
+    "gulp-w3c-html-validation": "0.0.1",
+    "jquery": "^3.7.1",
+    "mouseover_detect": "^1.0.0",
+    "sass": "^1.79.4"
+  },
+  "devDependencies": {}
+}

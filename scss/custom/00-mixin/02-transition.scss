@@ -1,0 +1,23 @@
+@mixin transition($string) {
+  -webkit-transition: $string;
+  -moz-transition: $string;
+  -ms-transition: $string;
+  -o-transition: $string;
+  transition: $string;
+}
+
+@mixin transition-2($stringa, $stringb) {
+  -webkit-transition: $stringa $stringb;
+  -moz-transition: $stringa $stringb;
+  -ms-transition: $stringa $stringb;
+  -o-transition: $stringa $stringb;
+  transition: $stringa $stringb;
+}
+
+@mixin transition-multiple($stringc...) {
+  -webkit-transition: $stringc;
+  -moz-transition: $stringc;
+  -ms-transition: $stringc;
+  -o-transition: $stringc;
+  transition: $stringc;
+}

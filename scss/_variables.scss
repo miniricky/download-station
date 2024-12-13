@@ -1,3 +1,10 @@
+// Spacing
+//
+// Control the default styling of most Bootstrap elements by modifying these
+// variables. Mostly focused on spacing.
+// You can add more entries to the $spacers map, should you need more variation.
+$spacer: 1rem !default;
+
 // Grid breakpoints
 //
 // Define the minimum dimensions at which your layout will change,
@@ -26,3 +33,14 @@ $container-paddings-x: (
 
 // Colors.
 $white: #ffffff !default;
+
+// Offcanvas
+
+// scss-docs-start offcanvas-variables
+$offcanvas-vertical-height:         50vh !default;
+$offcanvas-transition-duration:     .3s !default;
+
+// List group
+
+// scss-docs-start list-group-variables
+$list-group-item-padding-y:         $spacer * 1 !default;

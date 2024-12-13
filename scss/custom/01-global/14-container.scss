@@ -4,6 +4,13 @@
   padding-right: map-get($container-paddings-x, 'sm');
 }
 
+#login{
+  .container{
+    max-width: map-get($container-max-widths, 'sm');
+  }
+}
+
+
 @include media-breakpoint-up(md) {
   .container-fluid,
   .container{

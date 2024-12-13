@@ -1,5 +1,5 @@
 {
-  "name": "web-template",
+  "name": "download-station",
   "version": "1.0.0",
   "description": "A bootstrap5 starter web template",
   "main": "gulpfile.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:miniricky/web-template.git"
+    "url": "git@github.com:miniricky/download-station.git"
   },
   "author": "Miniricky",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/miniricky/web-template/issues"
+    "url": "https://github.com/miniricky/download-station/issues"
   },
-  "homepage": "https://github.com/miniricky/web-template#readme",
+  "homepage": "https://github.com/miniricky/download-station#readme",
   "dependencies": {
     "bootstrap": "^5.3.3",
     "gulp": "^5.0.0",

@@ -8,10 +8,9 @@
     $sid = $_COOKIE['sid'];
     $domain = $_COOKIE['domain'];
 
-    if ($data == 'verify-path') {
-      $path = $_POST['path'];
-      $pathVerified = verifyPath($path, $sid, $domain);
-      jsonEncode('verify', $pathVerified);
+    if ($data == 'get-path') {
+      $folder = getPath($sid, $domain);
+      jsonEncode('folder', $folder);
     }
 
     if ($data == 'scraping-pagination') {
@@ -42,10 +41,11 @@
     }
 
     if ($data == 'verify-episode') {
+      $folder = $_POST['folder'];
       $title = $_POST['title'];
       $episode = $_POST['episode'];
 
-      $verify = verifyEpisode($sid, $domain, $title, $episode);
+      $verify = verifyEpisode($sid, $domain, $folder, $title, $episode);
       jsonEncode('verify', $verify);
     }
 
@@ -56,9 +56,10 @@
 
     if ($data == 'download-station') {
       $url = $_POST['url'];
+      $folder = $_POST['folder'];
       $title = $_POST['title'];
       $episode = $_POST['episode'];
-      $download = verifyFolder($title, $url, $episode, $sid, $domain);
+      $download = verifyFolder($title, $url, $folder, $episode, $sid, $domain);
       jsonEncode('download', $download);
     }
 
@@ -75,10 +76,11 @@
     }
 
     if ($data == 'rename-file') {
+      $folder = $_POST['folder'];
       $title = $_POST['title'];
       $name = $_POST['name'];
       $episode = $_POST['episode'];
-      $rename = renameFile($sid, $domain, $title, $name, $episode);
+      $rename = renameFile($sid, $domain, $folder, $title, $name, $episode);
       jsonEncode('rename', $rename);
     }
   }
@@ -96,25 +98,25 @@
   /*
     * Function for verify if exist folder.
     */
-  function verifyPath($path, $sid, $domain) {
-    $path = '/' . $path;
-    $pathEncode = rawurlencode($path);
-    $verify_path_url = "http://$domain:5000/webapi/entry.cgi?api=SYNO.FileStation.List&version=2&method=list&folder_path=$pathEncode&_sid=$sid";
-    $verify_path_response = file_get_contents($verify_path_url);
-    $verify_path_data = json_decode($verify_path_response, true);
-    $verify = [];
+  function getPath($sid, $domain) {
+    $get_path_url = "http://$domain:5000/webapi/entry.cgi?api=SYNO.FileStation.List&version=2&method=list_share&_sid=$sid";
+    $get_path_response = file_get_contents($get_path_url);
+    $get_path_data = json_decode($get_path_response, true);
 
-    if ($verify_path_data['success']) {
-      $verify = [
-        'status' => 'true'
-      ];
+    $folder = [];
+    if ($get_path_data['success']) {
+      foreach ($get_path_data['data']['shares'] as $share) {
+        $folder[] = [
+          'path' => $share['name']
+        ];
+      }
     } else {
-      $verify = [
-        'error' => 'The folder ' . $path . ' do not exist'
+      $folder = [
+        'error' => 'Failed to retrieve shared folders.'
       ];
     }
 
-    return $verify;
+    return $folder;
   }
 
   /*
@@ -213,9 +215,9 @@
   /*
     * Function for verify if episode exist in synology folder.
     */
-  function verifyEpisode($sid, $domain, $title, $episode) {
+  function verifyEpisode($sid, $domain, $folder, $title, $episode) {
     $title = str_replace(':', ' -', $title);
-    $path = '/anime/' . $title;
+    $path = '/' . $folder . '/' . $title;
     $pathEncode = rawurlencode($path);
     $name = $title . ' - ' . $episode . '.mp4';
 
@@ -275,7 +277,7 @@
   }
 
   /*
-    * Function for send the download url.
+    * Function for verify id download station exist.
     */
   function verifyPackage($sid, $domain) {
     $package_url = "http://$domain:5000/webapi/entry.cgi?api=SYNO.Core.Package&version=1&method=list&_sid=$sid";
@@ -306,18 +308,19 @@
   /*
     * Function for verify if the folder exist.
     */
-  function verifyFolder($title, $url, $episode, $sid, $domain) {
+  function verifyFolder($title, $url, $folder, $episode, $sid, $domain) {
     $title = str_replace(':', ' -', $title);
-    $path = 'anime/' . $title;
+    $path = '/' . $folder;
+    $pathEncode = $folder . '/' . $title;
     $title = rawurlencode($title);
 
-    $create_folder_url = "http://$domain:5000/webapi/entry.cgi?api=SYNO.FileStation.CreateFolder&version=2&method=create&folder_path=/anime&name=$title&_sid=$sid";
+    $create_folder_url = "http://$domain:5000/webapi/entry.cgi?api=SYNO.FileStation.CreateFolder&version=2&method=create&folder_path=$path&name=$title&_sid=$sid";
     $create_folder_response = file_get_contents($create_folder_url);
     $create_folder_data = json_decode($create_folder_response, true);
     $download = [];
 
     if ($create_folder_data['success']) {
-      $download = initDownload($sid, $url, rawurlencode($path), $episode);
+      $download = initDownload($sid, $url, rawurlencode($pathEncode), $episode);
     } else {
       $download = [
         'error' => 'Error creating folder: ' . $create_folder_data['error']['code']
@@ -427,9 +430,9 @@
     return $info;
   }
 
-  function renameFile($sid, $domain, $title, $name, $episode){
+  function renameFile($sid, $domain, $folder, $title, $name, $episode){
     $title = str_replace(':', ' -', $title);
-    $path = '/anime/' . $title . '/' . $name;
+    $path = '/' . $folder . '/' . $title . '/' . $name;
     $pathEncode = str_replace('%2F', '/', rawurlencode($path));
     $episode = $title . ' - ' . $episode  . '.mp4';
     $episodeEncode = rawurlencode($episode);

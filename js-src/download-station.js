@@ -20,14 +20,44 @@
       }
 
       const container = document.querySelector('#download-station');
-      const path = container.querySelector('#animePath');
+
+      /*
+      * Function for get shared folders.
+      */
+      get_Path(container)
+      function get_Path(container) {
+        const params = `info=get-path`;
+        fetchRequest('../includes/download-station.php', params, (err, responseData) => {
+          if (err) {
+            console.log('Error in getPath:', err);
+            return;
+          }
+
+          if (responseData.folder.error) {
+            showToast(responseData.verify.error)
+          }
+          else {
+            const select = container.querySelector('.folder-select');
+
+            responseData.folder.forEach(folder => {
+              const newOption = document.createElement('option');
+              newOption.value = folder.path;
+              newOption.textContent = capFirst(folder.path);
+              select.appendChild(newOption);
+            });
+          }
+        });
+      }
 
       let unique = 0;
       const scraping = container.querySelector('#initScraping');
       scraping.addEventListener('click', function () {
-        if (unique === 0 && path.value.trim() !== '') {
+        const folder = document.querySelector('.folder-select');
+        const selectedValue = folder.value;
+
+        if (unique === 0 && selectedValue != 'Select a folder') {
           //unique++;
-          verifyPath(path.value, container);
+          scrapingPagination(container);
         }
         else{
           showToast('You must add a folder')
@@ -68,26 +98,6 @@
         })
         .catch(error => {
           callback(error, null);
-        });
-      }
-
-      /*
-      * Function for create principal path.
-      */
-      function verifyPath(path, container) {
-        const params = `info=verify-path&path=${encodeURIComponent(path)}`;
-        fetchRequest('../includes/download-station.php', params, (err, responseData) => {
-          if (err) {
-            console.log('Error in verifyPath:', err);
-            return;
-          }
-
-          if (responseData.verify.error) {
-            showToast(responseData.verify.error)
-          }
-          else {
-            scrapingPagination(container);
-          }
         });
       }
 
@@ -453,7 +463,7 @@
       function addAnime(animeList, wrapper) {
         animeList.forEach(anime => {
           const colDiv = document.createElement('div');
-          colDiv.classList.add('anime-wrapper', 'col-12', 'col-md-4', 'col-lg-3', 'col-xl-2');
+          colDiv.classList.add('anime-wrapper', 'col-12', 'col-md-4', 'col-lg-3');
 
           const animeDiv = document.createElement('div');
           animeDiv.classList.add('anime');
@@ -560,7 +570,10 @@
       * Function for verify if exist the episo on file station.
       */
       function varifyEpisode(link, title, episode, offCanvas, totalEpisodes, index, container) {
-        const data = `info=verify-episode&title=${encodeURIComponent(title)}&episode=${encodeURIComponent(episode)}`;
+        const folderSelect = document.querySelector('.folder-select');
+        const folder = folderSelect.value;
+
+        const data = `info=verify-episode&folder=${encodeURIComponent(folder)}&title=${encodeURIComponent(title)}&episode=${encodeURIComponent(episode)}`;
         fetchRequest('../includes/download-station.php', data, (err, responseData) => {
           if (err) {
             console.log('Error fetching episode verification:', err);
@@ -576,7 +589,7 @@
               removeSelect(container);
             }
           } else {
-            scrapingSreamtape(link, title, episode, offCanvas, totalEpisodes, index, list, container);
+            scrapingSreamtape(link, folder, title, episode, offCanvas, totalEpisodes, index, list, container);
           }
         });
       }
@@ -584,7 +597,7 @@
       function removeSelect(container) {
         const selected = container.querySelector('.anime.selected');
         if (selected) {
-          selected.classList.remove('selected');
+          selected.classList.remove('selected', 'active');
           countEpisodes = 0;
 
           const overlay = selected.querySelector('.overlay');
@@ -605,7 +618,7 @@
       /*
       * Function for scraping download link.
       */
-      function scrapingSreamtape(scrapeUrl, title, episode, offCanvas, totalEpisodes, index, list, container) {
+      function scrapingSreamtape(scrapeUrl, folder, title, episode, offCanvas, totalEpisodes, index, list, container) {
         const url = 'http://localhost:4000/scrape';
         fetch(url, {
           method: 'POST',
@@ -617,7 +630,7 @@
           if (result.data[0].status === true) {
             const url = 'https:' + result.data[0].src;
             const encodedUrl = encodeURIComponent(url);
-            sendURL(encodedUrl, title, episode, offCanvas, result.data[0].title, totalEpisodes, index, list, container);
+            sendURL(encodedUrl, folder, title, episode, offCanvas, result.data[0].title, totalEpisodes, index, list, container);
           } else{
             addLitoListGroup(list, episode + ' ' + result.data[0].message, index)
 
@@ -633,8 +646,8 @@
       /*
       * Function for send the download url.
       */
-      function sendURL(url, title, episode, offCanvas, name, totalEpisodes, index, list, container) {
-        const params = `info=download-station&url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&episode=${encodeURIComponent(episode)}`;
+      function sendURL(url, folder, title, episode, offCanvas, name, totalEpisodes, index, list, container) {
+        const params = `info=download-station&url=${encodeURIComponent(url)}&folder=${encodeURIComponent(folder)}&title=${encodeURIComponent(title)}&episode=${encodeURIComponent(episode)}`;
         fetchRequest('../includes/download-station.php', params, (err, responseData) => {
           if (err) {
             console.log('Error in sendURL:', err);
@@ -642,11 +655,12 @@
           }
 
           if (responseData.download.error) {
+            console.log(responseData);
             return;
           }
 
           addLitoListGroup(list, responseData.download.message, index)
-          idDownload(name, offCanvas, episode, title, totalEpisodes, list, index, container);
+          idDownload(name, offCanvas, episode, folder, title, totalEpisodes, list, index, container);
         });
       }
 
@@ -654,7 +668,7 @@
       * Function for get the download information.
       */
       let waiting = 0;
-      function idDownload(name, offCanvas, episode, title, totalEpisodes, list, index, container) {
+      function idDownload(name, offCanvas, episode, folder, title, totalEpisodes, list, index, container) {
         const intervalDownload = setInterval(() => {
           const params = `info=id-download&name=${encodeURIComponent(name)}`;
           fetchRequest('../includes/download-station.php', params, (err, responseData) => {
@@ -672,7 +686,7 @@
             if (responseData.id.download === 'downloading') {
               const id = responseData.id.id;
               clearInterval(intervalDownload);
-              infoDownload(id, episode, offCanvas, title, name, totalEpisodes, list, index, container);
+              infoDownload(id, episode, offCanvas, folder, title, name, totalEpisodes, list, index, container);
             }
           });
         }, 5000);
@@ -688,7 +702,7 @@
       /*
       * Function for start to download.
       */
-      function infoDownload(id, episode, offCanvas, title, name, totalEpisodes, list, index, container) {
+      function infoDownload(id, episode, offCanvas, folder, title, name, totalEpisodes, list, index, container) {
         const intervalInfo = setInterval(() => {
           const params = `info=info-download&id=${encodeURIComponent(id)}`;
           fetchRequest('../includes/download-station.php', params, (err, responseData) => {
@@ -731,7 +745,7 @@
               const progressContainer = progressBar.parentElement;
               progressContainer.setAttribute('aria-valuenow', progress);
 
-              renameFile(title, name, episode, totalEpisodes, container);
+              renameFile(folder, title, name, episode, totalEpisodes, container);
               clearInterval(intervalInfo);
             }
           });
@@ -765,12 +779,17 @@
       /*
       * Function for rename file.
       */
-      function renameFile(title, name, episode, totalEpisodes, container) {
-        const params = `info=rename-file&title=${encodeURIComponent(title)}&name=${encodeURIComponent(name)}&episode=${encodeURIComponent(episode)}`;
+      function renameFile(folder, title, name, episode, totalEpisodes, container) {
+        const params = `info=rename-file&folder=${encodeURIComponent(folder)}&title=${encodeURIComponent(title)}&name=${encodeURIComponent(name)}&episode=${encodeURIComponent(episode)}`;
         fetchRequest('../includes/download-station.php', params, (err, responseData) => {
           if (err) {
             console.log('Error in renameFile:', err);
             return;
+          }
+
+          countEpisodes++;
+          if (totalEpisodes == countEpisodes) {
+            removeSelect(container)
           }
         });
       }

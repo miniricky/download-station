@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
-  <title>Download Station</title>
+  <title>Static Template</title>
 
   <!-- CSS styles -->
   <link href="./css/style.min.css" rel="stylesheet">
@@ -17,9 +17,9 @@
       <form id="url-form">
         <label for="animeUrl" class="form-label">URL</label>
         <input type="text" class="form-control" id="animeUrl" placeholder="Added url">
-        <label for="animePath" class="form-label">Folder *</label>
-        <input type="text" class="form-control" id="animePath" placeholder="Added folder">
-        <button type="submit" id="downloadAnime" class="btn btn-primary">Download</button>
+        <select class="folder-select form-select" aria-label="select folder">
+          <option selected>Select a folder</option>
+        </select>
       </form>
 
       <button type="button" id="initScraping" class="btn btn-link text-white">Scraping AnimeFLV</button>

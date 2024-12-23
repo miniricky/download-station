@@ -365,23 +365,11 @@
     if ($list_data['success']) {
       if (!empty($list_data['data']['tasks'])) {
         foreach ($list_data['data']['tasks'] as $task) {
-          if ($task['status'] == 'waiting') {
+          if ($task['title'] == $name) {
             $id = [
-              'download' => $task['status'],
-              'status' => 'true',
-              'error' => 'Trying to get ID.'
+              'id' => $task['id'],
+              'download' => $task['status']
             ];
-          }
-
-          if ($task['status'] == 'downloading') {
-            if ($task['title'] == $name) {
-              $id = [
-                'id' => $task['id'],
-                'download' => $task['status'],
-                'status' => 'true',
-                'error' => 'Trying to get ID.'
-              ];
-            }
           }
         }
       }
@@ -423,7 +411,7 @@
     }
     else{
       $info = [
-        'error' => 'Error trying to get info download.'
+        'status' => $task_info['status']
       ];
     }
 

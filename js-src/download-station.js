@@ -56,7 +56,7 @@
         const selectedValue = folder.value;
 
         if (unique === 0 && selectedValue != 'Select a folder') {
-          //unique++;
+          unique++;
           scrapingPagination(container);
         }
         else{
@@ -518,7 +518,7 @@
       */
       var countEpisodes = 0;
       function scrapingAnime(scrapeUrl, container) {
-        const url = 'http://localhost:3000/scrape';
+        const url = 'http://localhost:3000/scrape/anime';
 
         fetch(url, {
           method: 'POST',
@@ -589,7 +589,7 @@
               removeSelect(container);
             }
           } else {
-            scrapingSreamtape(link, folder, title, episode, offCanvas, totalEpisodes, index, list, container);
+            scrapingStreamtape(link, folder, title, episode, offCanvas, totalEpisodes, index, list, container);
           }
         });
       }
@@ -618,30 +618,60 @@
       /*
       * Function for scraping download link.
       */
-      function scrapingSreamtape(scrapeUrl, folder, title, episode, offCanvas, totalEpisodes, index, list, container) {
-        const url = 'http://localhost:4000/scrape';
+      function scrapingStreamtape(scrapeUrl, folder, title, episode, offCanvas, totalEpisodes, index, list, container) {
+        const url = 'http://localhost:3000/scrape/streamtape';
         fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: scrapeUrl })
         })
-        .then(response => response.ok ? response.json() : Promise.reject('Fetch failed'))
+        .then(response => {
+          if (!response.ok) {
+            if (response.status === 400) {
+              const errorMessage = 'page is unreachable.';
+              addLitoListGroup(list, `${episode} Error: ${errorMessage}`, index);
+
+              countEpisodes++;
+              if (totalEpisodes === countEpisodes) {
+                removeSelect(container);
+              }
+
+              return Promise.reject('Page is unreachable');
+            }
+
+            return Promise.reject(new Error('Bad Request'));
+          }
+
+          return response.json();
+        })
         .then(result => {
-          if (result.data[0].status === true) {
+          if (result && result.data && result.data[0]?.status === true) {
             const url = 'https:' + result.data[0].src;
             const encodedUrl = encodeURIComponent(url);
             sendURL(encodedUrl, folder, title, episode, offCanvas, result.data[0].title, totalEpisodes, index, list, container);
-          } else{
-            addLitoListGroup(list, episode + ' ' + result.data[0].message, index)
+          } else {
+            const errorMessage = result?.data?.[0]?.message || 'No video found.';
+            addLitoListGroup(list, `${episode} ${errorMessage}`, index);
 
             countEpisodes++;
-            if (totalEpisodes == countEpisodes) {
-              removeSelect(container)
+            if (totalEpisodes === countEpisodes) {
+              removeSelect(container);
             }
           }
         })
-        .catch(error => console.error('Fetch error:', error));
-      }
+        .catch(error => {
+          if (error !== 'Page is unreachable' && error.message !== 'Bad Request') {
+            const errorMessage = error.message || 'Unexpected error occurred.';
+            addLitoListGroup(list, `${episode} Error: ${errorMessage}`, index);
+
+            countEpisodes++;
+            if (totalEpisodes === countEpisodes) {
+              removeSelect(container);
+            }
+          }
+        });
+    }
+
 
       /*
       * Function for send the download url.
@@ -677,19 +707,13 @@
               return;
             }
 
-            if (responseData.id.download === 'waiting') {
-              if (waiting === 0) {
-
-              }
-            }
-
-            if (responseData.id.download === 'downloading') {
+            if (responseData.id.download == 'downloading') {
               const id = responseData.id.id;
               clearInterval(intervalDownload);
               infoDownload(id, episode, offCanvas, folder, title, name, totalEpisodes, list, index, container);
             }
           });
-        }, 5000);
+        }, 1000);
       }
 
       /*
@@ -711,19 +735,24 @@
               return;
             }
 
-            var progress = (responseData.info.download / responseData.info.size) * 100;
-            progress = Math.round(progress);
-
             if (responseData.info.status === 'error') {
               clearInterval(intervalInfo);
+
+              const episodeStatus = offCanvas.querySelector('.list-group-item.item-' + index);
+              episodeStatus.textContent = episode + ': page is unreachable.';
 
               countEpisodes++;
               if (totalEpisodes === countEpisodes) {
                 removeSelect(container)
               }
+
+              return;
             }
 
-            if (responseData.info.status !== 'finished') {
+            var progress = (responseData.info.download / responseData.info.size) * 100;
+            progress = Math.round(progress);
+
+            if (responseData.info.status !== 'finished' && responseData.info.status !== 'completed') {
               if (responseData.info.size > 0) {
                 const progressDiv = offCanvas.querySelector(`.progress.${id}`);
                 if (!progressDiv) {

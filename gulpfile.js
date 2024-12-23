@@ -21,6 +21,7 @@ var js_scripts = [
   './node_modules/bootstrap/dist/js/bootstrap.bundle.min.js',
   './node_modules/jquery/dist/jquery.min.js',
   './js-src/download-station.js',
+  './js-src/verify-sid.js',
   './js-src/login.js'
 ];
 

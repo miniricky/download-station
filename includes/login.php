@@ -69,12 +69,12 @@
     if ($response_data['success']) {
       $validate = [
         'status' => 'true',
-        'error' => 'The session is active.'
+        'message' => 'The session is active.'
       ];
     } else {
       $validate = [
         'status' => 'false',
-        'error' => 'The SID has expired or is invalid.'
+        'message' => 'The SID has expired or is invalid.'
       ];
     }
 

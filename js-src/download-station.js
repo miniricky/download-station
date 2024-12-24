@@ -608,9 +608,14 @@
       /*
       * Function for add Li to list Group.
       */
-      function addLitoListGroup(list, message, index) {
+      function addLitoListGroup(list, message, index, color) {
         const newListItem = document.createElement('li');
-        newListItem.className = 'list-group-item item-' + index;
+        newListItem.className = 'list-group-item item-' + index + '';
+
+        if (color) {
+          newListItem.classList.add(color);
+        }
+
         newListItem.textContent = message;
         list.appendChild(newListItem);
       }
@@ -629,7 +634,7 @@
           if (!response.ok) {
             if (response.status === 400) {
               const errorMessage = 'page is unreachable.';
-              addLitoListGroup(list, `${episode} Error: ${errorMessage}`, index);
+              addLitoListGroup(list, `${episode} Error: ${errorMessage}`, index, 'text-danger');
 
               countEpisodes++;
               if (totalEpisodes === countEpisodes) {
@@ -651,7 +656,7 @@
             sendURL(encodedUrl, folder, title, episode, offCanvas, result.data[0].title, totalEpisodes, index, list, container);
           } else {
             const errorMessage = result?.data?.[0]?.message || 'No video found.';
-            addLitoListGroup(list, `${episode} ${errorMessage}`, index);
+            addLitoListGroup(list, `${episode} ${errorMessage}`, index, 'text-danger');
 
             countEpisodes++;
             if (totalEpisodes === countEpisodes) {
@@ -662,7 +667,7 @@
         .catch(error => {
           if (error !== 'Page is unreachable' && error.message !== 'Bad Request') {
             const errorMessage = error.message || 'Unexpected error occurred.';
-            addLitoListGroup(list, `${episode} Error: ${errorMessage}`, index);
+            addLitoListGroup(list, `${episode} Error: ${errorMessage}`, index, 'text-danger');
 
             countEpisodes++;
             if (totalEpisodes === countEpisodes) {
@@ -670,7 +675,7 @@
             }
           }
         });
-    }
+      }
 
 
       /*
@@ -739,6 +744,7 @@
               clearInterval(intervalInfo);
 
               const episodeStatus = offCanvas.querySelector('.list-group-item.item-' + index);
+              episodeStatus.classList.add('text-danger');
               episodeStatus.textContent = episode + ': page is unreachable.';
 
               countEpisodes++;

@@ -19,9 +19,6 @@
           unique++;
           scrapingPagination(container);
         }
-        else{
-          showToast('There are active downloads')
-        }
       });
 
       /*
@@ -468,13 +465,7 @@
 
           const list = offCanvas.querySelector('.list-group');
           list.addEventListener('click', function (e) {
-            if (e.target.tagName === 'A') {
-              var href = e.target.href;
-              var episode = e.target.textContent;
-              var title = e.target.title;
-
-              downloadEpisode(href, episode, title);
-            }
+            if (e.target.tagName === 'A') {}
           });
 
           result.data.forEach((episode, index) => {
@@ -543,7 +534,7 @@
           list.appendChild(newListItem);
         }
         else {
-          const fileName = title + ' - ' + message;
+          const fileName = title + ' - ' + message + '.mp4';
           const downloadUrl = `/includes/download-file.php?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(fileName)}`;
 
           const anchor = document.createElement('a');
@@ -615,21 +606,6 @@
               removeSelect(container);
             }
           }
-        });
-      }
-
-      /*
-      * Function for scraping episodes.
-      */
-      function downloadEpisode(url, episode, title) {
-        const data = `info=download-episode&url=${encodeURIComponent(url)}&episode=${encodeURIComponent(episode)}&title=${encodeURIComponent(title)}&device=desktop`;
-        fetchRequest('../includes/download-station.php', data, (err, responseData) => {
-          if (err) {
-            console.log('Error fetching episode data:', err);
-            return;
-          }
-
-          console.log(responseData);
         });
       }
     }

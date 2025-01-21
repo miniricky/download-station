@@ -2,6 +2,15 @@
   document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.includes('desktop.html')) {
       const container = document.querySelector('#desktop');
+      const domain = window.location.hostname;
+      var domainNode = '';
+
+      if (domain == 'download-station.test') {
+        domainNode = 'http://localhost:3000';
+      }
+      else{
+        domainNode = 'https://192.168.101.11:3000';
+      }
 
       let unique = 0;
       const scraping = container.querySelector('#initScraping');
@@ -444,7 +453,7 @@
       */
       var countEpisodes = 0;
       function scrapingAnime(scrapeUrl, container) {
-        const url = 'http://localhost:3000/scrape/anime';
+        const url = domainNode + '/scrape/anime';
 
         fetch(url, {
           method: 'POST',
@@ -552,7 +561,7 @@
       * Function for scraping download link.
       */
       function scrapingStreamtape(scrapeUrl, title, episode, offCanvas, totalEpisodes, index, list, container) {
-        const url = 'http://localhost:3000/scrape/streamtape';
+        const url = domainNode + '/scrape/streamtape';
         fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -1,0 +1,44 @@
+name: Deploy to Server via Tailscale
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Install Tailscale
+      run: |
+        curl -fsSL https://tailscale.com/install.sh | sh
+        sudo tailscale up --authkey=${{ secrets.TAILSCALE_AUTH_KEY }}
+
+    - name: Test SSH connection
+      run: |
+        ssh -o StrictHostKeyChecking=no miniricky@100.125.23.21
+
+    - name: Deploy files to serverwwwww
+      run: |
+        rsync -avz --delete \
+          --exclude='.github' \
+          --exclude='.git' \
+          --exclude='generators' \
+          --exclude='gulpfile.js' \
+          --exclude='js-src' \
+          --exclude='node_modules' \
+          --exclude='package.json' \
+          --exclude='package-lock.json' \
+          --exclude='README.md' \
+          --exclude='scss' \
+          --exclude='templates' \
+          ./ miniricky@100.125.23.21:/volume1/sites/download-station

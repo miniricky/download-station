@@ -11,39 +11,18 @@
   <link href="./css/style.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-dark text-white visually-hidden">
-  <div class="section-row" id="download-station">
+<body class="bg-dark text-white">
+  <div class="section-row" id="two-columns">
     <div class="container-fluid">
-      <form id="url-form">
-        <label for="animeUrl" class="form-label">URL</label>
-        <input type="text" class="form-control" id="animeUrl" placeholder="Added url">
-        <select class="folder-select form-select" aria-label="select folder">
-          <option selected>Select a folder</option>
-        </select>
-      </form>
+      <div class="row">
+        <div class="col-12 col-md-6">
+          Desktop
+        </div>
 
-      <button type="button" id="initScraping" class="btn btn-link text-white">Scraping AnimeFLV</button>
-
-      <div class="row row-30"></div>
-    </div>
-  </div>
-  <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header">
-        <img src="./images/synology-packages/download-station.png" class="rounded me-2" alt="...">
-        <strong class="me-auto">Download Station</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        <div class="col-12 col-md-6">
+          Synology
+        </div>
       </div>
-      <div class="toast-body"></div>
-    </div>
-  </div>
-  <div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasBottomLabel"></h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body small">
-      <ul class="list-group list-group-flush"></ul>
     </div>
   </div>
   <script src="./js/scripts-all.min.js"></script>

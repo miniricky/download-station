@@ -1,66 +1,17 @@
 (function ($) {
   document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname.includes('synology.html')) {
-      const sessionCookie = getCookie('sid');
-
-      if (sessionCookie) {
-        const element = document.querySelector('body');
-        element.classList.remove('visually-hidden');
-      } else {
-        window.location.href = 'login.html';
-      }
-
-      /*
-       * Function for get cookie.
-       */
-      function getCookie(name) {
-        const cookies = document.cookie.split(';').map(cookie => cookie.trim());
-        const foundCookie = cookies.find(cookie => cookie.startsWith(name + '='));
-        return foundCookie ? foundCookie.substring((name + '=').length) : null;
-      }
-
-      const container = document.querySelector('#download-station');
-
-      /*
-      * Function for get shared folders.
-      */
-      get_Path(container);
-      function get_Path(container) {
-        const params = `info=get-path&device=synology`;
-        fetchRequest('../includes/download-station.php', params, (err, responseData) => {
-          if (err) {
-            console.log('Error in getPath:', err);
-            return;
-          }
-
-          if (responseData.folder.error) {
-            showToast(responseData.verify.error)
-          }
-          else {
-            const select = container.querySelector('.folder-select');
-
-            responseData.folder.forEach(folder => {
-              const newOption = document.createElement('option');
-              newOption.value = folder.path;
-              newOption.textContent = capFirst(folder.path);
-              select.appendChild(newOption);
-            });
-          }
-        });
-      }
+    if (window.location.pathname.includes('desktop.html')) {
+      const container = document.querySelector('#desktop');
 
       let unique = 0;
       const scraping = container.querySelector('#initScraping');
       scraping.addEventListener('click', function () {
-        const folder = document.querySelector('.folder-select');
-        const selectedValue = folder.value;
-
-        if (unique === 0 && selectedValue != 'Select a folder') {
+        if (unique === 0) {
           unique++;
           scrapingPagination(container);
         }
         else{
-          showToast('You must add a folder')
+          showToast('There are active downloads')
         }
       });
 
@@ -105,7 +56,7 @@
       * Function for scraping pagination.
       */
       function scrapingPagination(container) {
-        const data = `info=scraping-pagination&device=synology`;
+        const data = `info=scraping-pagination&device=desktop`;
         fetchRequest('../includes/download-station.php', data, function (err, responseData) {
           if (err) {
             console.log('Error:', err);
@@ -269,7 +220,7 @@
       * Function for scraping FLV.
       */
       function scrapingFLV(container, page, totalPages) {
-        const data = `info=scraping-flv&page=${encodeURIComponent(page)}&device=synology`;
+        const data = `info=scraping-flv&page=${encodeURIComponent(page)}&device=desktop`;
         fetchRequest('../includes/download-station.php', data, function (err, responseData) {
           if (err) {
             console.log('Error:', err);
@@ -343,7 +294,7 @@
       * Function for scraping search.
       */
       function scrapingSearch(value, wrapper) {
-        const params = `info=scraping-search&value=${encodeURIComponent(value)}&device=synology`;
+        const params = `info=scraping-search&value=${encodeURIComponent(value)}&device=desktop`;
         fetchRequest('../includes/download-station.php', params, (err, responseData) => {
           if (err) {
             console.log('Error in scrapingSearch:', err);
@@ -372,7 +323,7 @@
         const overlay = imageContainer.querySelector('.overlay');
         createSpan('gettingSpan', 'getting-episodes', 'Getting episodes', overlay);
         const url = 'https://www3.animeflv.net' + clickedAnime.getAttribute('data-url');
-        verifyPackage(url, container);
+        scrapingAnime(url, container);
       }
 
       /*
@@ -395,31 +346,6 @@
         }, 500);
       }
 
-      /*
-      * Function for verify if download station is installed.
-      */
-      function verifyPackage(url, container) {
-        const params = 'info=verify-package&device=synology';
-        fetchRequest('../includes/download-station.php', params, (err, responseData) => {
-          if (err) {
-            console.log('Error in verifyPackage:', err);
-            return;
-          }
-
-          var status = false;
-          responseData.verify.forEach(package => {
-            if (package.id === 'DownloadStation') {
-              status = true;
-            }
-          });
-
-          if (status) {
-            scrapingAnime(url, container);
-          } else{
-            showToast('Download Station is not installed');
-          }
-        });
-      }
 
       /*
       * Function for adding search to markup.
@@ -531,6 +457,17 @@
           var offCanvas = document.getElementById('offcanvasBottom');
           showCanvas(offCanvas, result.data[0].title);
 
+          const list = offCanvas.querySelector('.list-group');
+          list.addEventListener('click', function (e) {
+            if (e.target.tagName === 'A') {
+              var href = e.target.href;
+              var episode = e.target.textContent;
+              var title = e.target.title;
+
+              downloadEpisode(href, episode, title);
+            }
+          });
+
           result.data.forEach((episode, index) => {
             scrapingEpisode(episode.link, episode.title, episode.episode, offCanvas, totalEpisodes, index, container);
           });
@@ -555,42 +492,15 @@
       * Function for scraping episodes.
       */
       function scrapingEpisode(url, title, episode, offCanvas, totalEpisodes, index, container) {
-        const data = `info=scraping-episode&url=${encodeURIComponent(url)}&device=synology`;
+        const data = `info=scraping-episode&url=${encodeURIComponent(url)}&device=desktop`;
         fetchRequest('../includes/download-station.php', data, (err, responseData) => {
           if (err) {
             console.log('Error fetching episode data:', err);
             return;
           }
 
-          varifyEpisode(responseData.episode.link, title, episode, offCanvas, totalEpisodes, index, container);
-        });
-      }
-
-      /*
-      * Function for verify if exist the episode on file station.
-      */
-      function varifyEpisode(link, title, episode, offCanvas, totalEpisodes, index, container) {
-        const folderSelect = document.querySelector('.folder-select');
-        const folder = folderSelect.value;
-
-        const data = `info=verify-episode&folder=${encodeURIComponent(folder)}&title=${encodeURIComponent(title)}&episode=${encodeURIComponent(episode)}&device=synology`;
-        fetchRequest('../includes/download-station.php', data, (err, responseData) => {
-          if (err) {
-            console.log('Error fetching episode verification:', err);
-            return;
-          }
-
           const list = offCanvas.querySelector('.offcanvas-body .list-group');
-          if (responseData.verify.status === 'true') {
-            addLitoListGroup(list, responseData.verify.message, index)
-
-            countEpisodes++;
-            if (totalEpisodes == countEpisodes) {
-              removeSelect(container);
-            }
-          } else {
-            scrapingStreamtape(link, folder, title, episode, offCanvas, totalEpisodes, index, list, container);
-          }
+          scrapingStreamtape(responseData.episode.link, title, episode, offCanvas, totalEpisodes, index, list, container);
         });
       }
 
@@ -611,7 +521,7 @@
       /*
       * Function for add Li to list Group.
       */
-      function addLitoListGroup(list, message, index, color) {
+      function addLitoListGroup(list, message, index, color, url, title) {
         const newListItem = document.createElement('li');
         newListItem.className = 'list-group-item item-' + index + '';
 
@@ -619,14 +529,29 @@
           newListItem.classList.add(color);
         }
 
-        newListItem.textContent = message;
-        list.appendChild(newListItem);
+        if (url == '') {
+          newListItem.textContent = message;
+          list.appendChild(newListItem);
+        }
+        else {
+          const fileName = title + ' - ' + message;
+          const downloadUrl = `/includes/download-file.php?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(fileName)}`;
+
+          const anchor = document.createElement('a');
+          anchor.classList.add('download-link');
+          anchor.textContent = message;
+          anchor.href = downloadUrl;
+          anchor.target = '_blank';
+
+          newListItem.appendChild(anchor);
+          list.appendChild(newListItem);
+        }
       }
 
       /*
       * Function for scraping download link.
       */
-      function scrapingStreamtape(scrapeUrl, folder, title, episode, offCanvas, totalEpisodes, index, list, container) {
+      function scrapingStreamtape(scrapeUrl, title, episode, offCanvas, totalEpisodes, index, list, container) {
         const url = 'http://localhost:3000/scrape/streamtape';
         fetch(url, {
           method: 'POST',
@@ -655,8 +580,12 @@
         .then(result => {
           if (result && result.data && result.data[0]?.status === true) {
             const url = 'https:' + result.data[0].src;
-            const encodedUrl = encodeURIComponent(url);
-            sendURL(encodedUrl, folder, title, episode, offCanvas, result.data[0].title, totalEpisodes, index, list, container);
+            addLitoListGroup(list, episode, index, '', url, title);
+
+            countEpisodes++;
+            if (totalEpisodes === countEpisodes) {
+              removeSelect(container);
+            }
           } else {
             const errorMessage = result?.data?.[0]?.message || 'No video found.';
             addLitoListGroup(list, `${episode} ${errorMessage}`, index, 'text-danger');
@@ -680,155 +609,18 @@
         });
       }
 
-
       /*
-      * Function for send the download url.
+      * Function for scraping episodes.
       */
-      function sendURL(url, folder, title, episode, offCanvas, name, totalEpisodes, index, list, container) {
-        const params = `info=download-station&url=${encodeURIComponent(url)}&folder=${encodeURIComponent(folder)}&title=${encodeURIComponent(title)}&episode=${encodeURIComponent(episode)}&device=synology`;
-        fetchRequest('../includes/download-station.php', params, (err, responseData) => {
+      function downloadEpisode(url, episode, title) {
+        const data = `info=download-episode&url=${encodeURIComponent(url)}&episode=${encodeURIComponent(episode)}&title=${encodeURIComponent(title)}&device=desktop`;
+        fetchRequest('../includes/download-station.php', data, (err, responseData) => {
           if (err) {
-            console.log('Error in sendURL:', err);
+            console.log('Error fetching episode data:', err);
             return;
           }
 
-          if (responseData.download.error) {
-            console.log(responseData);
-            return;
-          }
-
-          addLitoListGroup(list, responseData.download.message, index)
-          idDownload(name, offCanvas, episode, folder, title, totalEpisodes, list, index, container);
-        });
-      }
-
-      /*
-      * Function for get the download information.
-      */
-      let waiting = 0;
-      function idDownload(name, offCanvas, episode, folder, title, totalEpisodes, list, index, container) {
-        const intervalDownload = setInterval(() => {
-          const params = `info=id-download&name=${encodeURIComponent(name)}&device=synology`;
-          fetchRequest('../includes/download-station.php', params, (err, responseData) => {
-            if (err) {
-              console.log('Error in idDownload:', err);
-              return;
-            }
-
-            if (responseData.id.download == 'downloading') {
-              const id = responseData.id.id;
-              clearInterval(intervalDownload);
-              infoDownload(id, episode, offCanvas, folder, title, name, totalEpisodes, list, index, container);
-            }
-          });
-        }, 1000);
-      }
-
-      /*
-      * Function for capitalize the first letter.
-      */
-      function capFirst(str) {
-        return str[0].toUpperCase() + str.slice(1);
-      }
-
-      /*
-      * Function for start to download.
-      */
-      function infoDownload(id, episode, offCanvas, folder, title, name, totalEpisodes, list, index, container) {
-        const intervalInfo = setInterval(() => {
-          const params = `info=info-download&id=${encodeURIComponent(id)}&device=synology`;
-          fetchRequest('../includes/download-station.php', params, (err, responseData) => {
-            if (err) {
-              console.log('Error in infoDownload:', err);
-              return;
-            }
-
-            if (responseData.info.status === 'error') {
-              clearInterval(intervalInfo);
-
-              const episodeStatus = offCanvas.querySelector('.list-group-item.item-' + index);
-              episodeStatus.classList.add('text-danger');
-              episodeStatus.textContent = episode + ': page is unreachable.';
-
-              countEpisodes++;
-              if (totalEpisodes === countEpisodes) {
-                removeSelect(container)
-              }
-
-              return;
-            }
-
-            var progress = (responseData.info.download / responseData.info.size) * 100;
-            progress = Math.round(progress);
-
-            if (responseData.info.status !== 'finished' && responseData.info.status !== 'completed') {
-              if (responseData.info.size > 0) {
-                const progressDiv = offCanvas.querySelector(`.progress.${id}`);
-                if (!progressDiv) {
-                  createProgressBar(id, progress, list, index);
-                } else {
-                  const progressBar = offCanvas.querySelector(`.progress.${id} .progress-bar`);
-                  progressBar.style.width = progress + '%';
-                  progressBar.textContent = progress + '%';
-
-                  const progressContainer = progressBar.parentElement;
-                  progressContainer.setAttribute('aria-valuenow', progress);
-                }
-              }
-            } else {
-              const progressBar = offCanvas.querySelector(`.progress.${id} .progress-bar`);
-              progressBar.style.width = '100%';
-              progressBar.textContent = '100%';
-
-              const progressContainer = progressBar.parentElement;
-              progressContainer.setAttribute('aria-valuenow', progress);
-
-              renameFile(folder, title, name, episode, totalEpisodes, container);
-              clearInterval(intervalInfo);
-            }
-          });
-        }, 5000);
-      }
-
-      /*
-      * Function for add progress bar to canvas.
-      */
-      function createProgressBar(id, progress, list, index) {
-        setTimeout(() => {
-          const progressContainer = document.createElement('div');
-          progressContainer.classList.add('progress', id);
-          progressContainer.setAttribute('role', 'progressbar');
-          progressContainer.setAttribute('aria-label', 'Example with label');
-          progressContainer.setAttribute('aria-valuenow', '25');
-          progressContainer.setAttribute('aria-valuemin', '0');
-          progressContainer.setAttribute('aria-valuemax', '100');
-
-          const progressBar = document.createElement('div');
-          progressBar.classList.add('progress-bar');
-          progressBar.style.width = progress + '%';
-          progressBar.textContent = progress + '%';
-          progressContainer.appendChild(progressBar);
-
-          const referenceNode = list.querySelector('.item-' + index)
-          list.insertBefore(progressContainer, referenceNode.nextSibling);
-        }, 500);
-      }
-
-      /*
-      * Function for rename file.
-      */
-      function renameFile(folder, title, name, episode, totalEpisodes, container) {
-        const params = `info=rename-file&folder=${encodeURIComponent(folder)}&title=${encodeURIComponent(title)}&name=${encodeURIComponent(name)}&episode=${encodeURIComponent(episode)}&device=synology`;
-        fetchRequest('../includes/download-station.php', params, (err, responseData) => {
-          if (err) {
-            console.log('Error in renameFile:', err);
-            return;
-          }
-
-          countEpisodes++;
-          if (totalEpisodes == countEpisodes) {
-            removeSelect(container)
-          }
+          console.log(responseData);
         });
       }
     }

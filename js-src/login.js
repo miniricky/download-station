@@ -8,7 +8,7 @@
     if (window.location.pathname.includes('login.html')) {
       const sessionCookie = getCookie('sid');
       if (sessionCookie) {
-        window.location.href = '/';
+        window.location.href = '/synology.html';
       }
       else{
         const elemento = document.querySelector('body');
@@ -68,7 +68,7 @@
           if (responseData.login.status === 'true') {
             setCookie('sid', responseData.login.sid, 7);
             setCookie('domain', responseData.login.domain, 7);
-            window.location.href = '/';
+            window.location.href = '/synology.html';
           }
         });
       }

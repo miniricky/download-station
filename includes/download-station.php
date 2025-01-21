@@ -5,8 +5,12 @@
 
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = $_POST['info'];
-    $sid = $_COOKIE['sid'];
-    $domain = $_COOKIE['domain'];
+    $device = $_POST['device'];
+
+    if ($device == 'synology') {
+      $sid = $_COOKIE['sid'];
+      $domain = $_COOKIE['domain'];
+    }
 
     if ($data == 'get-path') {
       $folder = getPath($sid, $domain);

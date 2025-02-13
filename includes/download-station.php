@@ -422,6 +422,9 @@
     return $info;
   }
 
+  /*
+    * Function for rename file.
+    */
   function renameFile($sid, $domain, $folder, $title, $name, $episode){
     $title = str_replace(':', ' -', $title);
     $path = '/' . $folder . '/' . $title . '/' . $name;

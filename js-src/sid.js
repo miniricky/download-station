@@ -5,28 +5,19 @@
 
 (function ($) {
   document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname.includes('login.html')) {
-      const sessionCookie = getCookie('sid');
-      if (sessionCookie) {
-        window.location.href = '/synology.html';
-      }
-      else{
-        const elemento = document.querySelector('body');
-        elemento.classList.remove('visually-hidden');
-      }
+    if (window.location.pathname.includes('animeflv.php')) {
+      const sidContainer = document.querySelector('#sid');
+      const sidForm = sidContainer.querySelector('#sid-form');
 
-      const loginContainer = document.querySelector('#login');
-      const loginForm = loginContainer.querySelector('#login-form');
-
-      loginForm.addEventListener('submit', function (e) {
+      sidForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const username = loginForm.querySelector('#username').value.trim();
-        const password = loginForm.querySelector('#password').value.trim();
-        const domain = loginForm.querySelector('#domain').value.trim();
+        const username = sidForm.querySelector('#username').value.trim();
+        const password = sidForm.querySelector('#password').value.trim();
+        const domain = sidForm.querySelector('#domain').value.trim();
 
         if (!(username ==="" || password ==="" || domain ==="")) {
-          login(username, password, domain);
+          login(username, password, domain, sidForm);
         }
         else{
           console.log('Please complete all fields.');
@@ -62,13 +53,26 @@
       /*
       * Function for login.
       */
-      function login(username, password, domain) {
-        const data = `info=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&domain=${encodeURIComponent(domain)}`;
-        createXHR('../includes/login.php', data, function (err, responseData) {
+      function login(username, password, domain, sidForm) {
+        const data = `info=sid&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&domain=${encodeURIComponent(domain)}`;
+        createXHR('../includes/sid.php', data, function (err, responseData) {
+          if (err) {
+            console.error(err);
+            return;
+          }
+
           if (responseData.login.status === 'true') {
             setCookie('sid', responseData.login.sid, 7);
             setCookie('domain', responseData.login.domain, 7);
-            window.location.href = '/synology.html';
+            
+            const modalElement = document.querySelector('#sidModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+            if (modalInstance) {
+              modalInstance.hide();
+            }
+
+            sidForm.reset();
           }
         });
       }

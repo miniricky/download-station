@@ -1,0 +1,185 @@
+#animeflv{
+  form#url-form{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    label{
+      margin: 0;
+    }
+  }
+
+  button#initScraping{
+    padding: 6px 0;
+
+    + *{
+      margin-top: 20px;
+    }
+  }
+
+  form#search-form{
+    label{
+      width: 100%;
+    }
+
+    input{
+      border-top-left-radius: 0.375rem;
+      border-bottom-left-radius: 0.375rem;
+    }
+
+    + *{
+      margin-top: 15px;
+    }
+  }
+
+  .row{
+    gap: 30px 0;
+
+    + *{
+      margin-top: 30px;
+    }
+  }
+
+  .anime-wrapper{
+    content-visibility: auto;
+
+    .anime{
+      position: relative;
+      height: 100%;
+
+      .image{
+        position: relative;
+
+        img{
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        > span{
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          background: black;
+          padding: 5px 10px;
+          opacity: .8;
+        }
+      }
+
+      .status{
+        display: flex;
+        gap: 0 5px;
+        padding: 10px 0;
+          
+        span{
+          background-color: #495057!important;
+          padding: 1px 8px;
+          border-radius: 25px;
+          font-size: 12px;
+        }
+      }
+
+      .text{
+        h2{
+          margin-bottom: 0;
+        }
+
+        + *{
+          margin-top: 5px;
+        }
+      }
+    }
+  }
+
+  .anime-detail{
+    .anime{
+      display: flex;
+      flex-direction: column;
+      gap: 15px 0;
+
+      .image{
+        display: flex;
+        justify-content: center;
+      }
+
+      .text{
+        width: 100%;
+
+        h2{
+          margin-bottom: 0;
+
+          + *{
+            margin-top: 5px;
+          }
+        }
+
+        p{
+          margin-bottom: 0;
+
+          + *{
+            margin-top: 5px;
+          }
+        }
+
+        .genres{
+          span.genre{
+            background-color: #495057!important;
+            padding: 1px 8px;
+            border-radius: 25px;
+            font-size: 12px;
+
+            + *{
+              margin-left: 5px;
+            }
+          }
+
+          + *{
+            margin-top: 10px;
+          }
+        }
+
+        .tab-content{
+          #synology-tab-pane{
+            > p{
+              margin-top: 15px;
+            }
+
+            .list-group-item{
+              a,
+              span{
+                + *{
+                  margin-top: 5px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .pagination-row{
+    padding: 0 15px;
+
+    ul.pagination{
+      flex-wrap: wrap;
+      gap: 10px 0;
+      justify-content: center;
+    }
+  }
+}
+
+@include media-breakpoint-up(md) {
+  #animeflv{
+    .anime-detail{
+      .anime{
+        flex-direction: row;
+        gap: 0 15px;
+
+        .image{
+          display: block;
+        }
+      }
+    }
+  }
+}

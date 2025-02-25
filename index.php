@@ -21,14 +21,14 @@
       <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <a class="nav-link active" aria-current="page" href="/">Home</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Sites
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="/">AnimeFlV</a></li>
+              <li><a class="dropdown-item" href="/animeflv.php">AnimeFlV</a></li>
             </ul>
           </li>
         </ul>
@@ -48,7 +48,7 @@
       </div>
     </div>
   </div>
-  <footer class="footer mt-auto py-3 text-center">
+  <footer class="footer mt-auto py-3 text-center border-top">
     <div class="container">
       <span>© Copyright 2025 — Download Station. All rights reserved. Created by <a href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
     </div>

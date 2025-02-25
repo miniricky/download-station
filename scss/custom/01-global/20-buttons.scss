@@ -1,1 +1,61 @@
+button.btn-link {
+  position: relative;
+  padding: 0 20px 0 0;
+  text-decoration: none;
+  color: $white;
+  transition: color 0.3s ease-in-out;
 
+  &:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0;
+    display: block;
+    @include mask-image(url("../images/fontawesome/circle-arrow-right-solid.svg"));
+    @include mask-repeat(no-repeat);
+    @include mask-size(15px 15px);
+    width: 15px;
+    height: 15px;
+    background: $white;
+    @include transform(translateY(-50%) translateX(0));
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &:active {
+    color: $white !important;
+  }
+
+  &:hover {
+    color: $white;
+
+    &::before {
+      transform: scaleX(1);
+    }
+  }
+
+  &:focus {
+    color: $white;
+
+    &::before {
+      transform: scaleX(1);
+    }
+  }
+}
+
+a{
+  color: white;
+  text-decoration: none;
+}

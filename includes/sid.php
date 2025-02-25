@@ -1,12 +1,8 @@
 <?php
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1);
-  error_reporting(E_ALL);
-
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = $_POST['info'];
 
-    if ($data == 'login') {
+    if ($data == 'sid') {
       $username = rawurlencode($_POST['username']);
       $password = rawurlencode($_POST['password']);
       $domain = rawurlencode($_POST['domain']);
@@ -14,10 +10,14 @@
       $login = login($username, $password, $domain);
       jsonEncode('login', $login);
     }
+  }
+
+  if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $data = $_GET['info'];
 
     if ($data == 'validate-sid') {
-      $sid = rawurlencode($_POST['sid']);
-      $domain = rawurlencode($_POST['domain']);
+      $sid = rawurlencode($_GET['sid']);
+      $domain = rawurlencode($_GET['domain']);
 
       $validate = validateSID($sid, $domain);
       jsonEncode('validate', $validate);

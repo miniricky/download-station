@@ -33,6 +33,7 @@ $container-paddings-x: (
 
 // Colors.
 $white: #ffffff !default;
+$black: #000000 !default;
 
 // Offcanvas
 
@@ -44,3 +45,33 @@ $offcanvas-transition-duration:     .3s !default;
 
 // scss-docs-start list-group-variables
 $list-group-item-padding-y:         $spacer * 1 !default;
+$list-group-bg:                     transparent !default;
+
+// Pagination
+
+// scss-docs-start pagination-variables
+$pagination-color:                  $white !default;
+$pagination-bg:                     transparent !default;;
+$pagination-border-width:           none !default;
+$pagination-border-color:           none !default;
+
+$pagination-focus-color:            $black !default;
+$pagination-focus-bg:               $white !default;
+
+$pagination-hover-color:            $black !default;
+$pagination-hover-bg:               $white !default;
+$pagination-hover-border-color:     $white !default;
+
+$pagination-active-color:           $black !default;
+$pagination-active-bg:              $white !default;
+$pagination-active-border-color:    $white !default;
+
+$pagination-disabled-color:         $black !default;
+$pagination-disabled-bg:            $white !default;
+$pagination-disabled-border-color:  $white !default;
+
+// Navs
+
+// scss-docs-start nav-variables
+$nav-link-color:                    $white !default;
+$nav-link-hover-color:         $white !default;

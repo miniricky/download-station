@@ -1,0 +1,70 @@
+ul.pagination{
+  flex-wrap: wrap;
+  gap: 10px 0;
+  justify-content: center;
+  margin-bottom: 0;
+
+  li.page-item{
+    &:first-child{
+      a.page-link{
+        position: relative;
+        padding: 6px 12px 6px 20px;
+
+        &:after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 0;
+          display: block;
+          @include mask-image(url("../images/fontawesome/angle-left-solid.svg"));
+          @include mask-repeat(no-repeat);
+          @include mask-size(15px 15px);
+          width: 15px;
+          height: 15px;
+          background: $white;
+          @include transform(translateY(-50%) translateX(0));
+        }
+      }
+    }
+
+    &:last-child{
+      a.page-link{
+        position: relative;
+        padding: 6px 20px 6px 12px;
+
+        &:after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          right: 0;
+          display: block;
+          @include mask-image(url("../images/fontawesome/angle-right-solid.svg"));
+          @include mask-repeat(no-repeat);
+          @include mask-size(15px 15px);
+          width: 15px;
+          height: 15px;
+          background: $white;
+          @include transform(translateY(-50%) translateX(0));
+        }
+      }
+    }
+
+    &:first-child,
+    &:last-child{
+      .page-link{
+        &:hover,
+        &:focus{
+          color: $white;
+          background-color: transparent;
+        }
+      }
+    }
+
+    &.deactivate{
+      a.page-link{
+        cursor: default;
+        opacity: .5;
+      }
+    }
+  }
+}

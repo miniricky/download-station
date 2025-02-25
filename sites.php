@@ -21,43 +21,34 @@
       <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <a class="nav-link active" aria-current="page" href="/">Home</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Sites
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="/">AnimeFlV</a></li>
+              <li><a class="dropdown-item" href="/animeflv.php">AnimeFlV</a></li>
             </ul>
           </li>
         </ul>
       </div>
     </div>
   </nav>
-  <div class="section-row" id="login">
-    <div class="container vh-100 align-content-center">
-      <form id="login-form">
-        <h1 class="h3 fw-normal">Please sign in</h1>
+  <div class="section-row" id="sites">
+    <div class="container-fluid">
+      <div class="animeflv-wrapper">
+        <button type="button" id="onAir" class="btn btn-success text-white status">On Air</button>
+        <button type="button" id="finished" class="btn btn-success text-white status">Finished</button>
+        <button type="button" id="comingSoon" class="btn btn-success text-white status">Coming Soon</button>
 
-        <label for="username">Username</label>
-        <input type="text" class="form-control" id="username" aria-describedby="username" placeholder="Username">
+        <div class="progress-wrapper">
 
-        <label for="password">Password</label>
-        <input type="password" class="form-control" id="password" aria-describedby="password" placeholder="Password" autocomplete="current-password">
-
-        <label for="domain">Domain</label>
-        <input type="text" class="form-control" id="domain" aria-describedby="domain" placeholder="Domain">
-
-        <span id="session" class="form-text d-block text-white">
-          The session is active for 7 days
-        </span>
-
-        <button class="btn btn-primary w-100 py-2" id="" type="submit">Sign in</button>
-      </form>
+        </div>
+      </div>
     </div>
   </div>
-  <footer class="footer mt-auto py-3 text-center">
+  <footer class="footer mt-auto py-3 text-center border-top">
     <div class="container">
       <span>© Copyright 2025 — Download Station. All rights reserved. Created by <a href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
     </div>

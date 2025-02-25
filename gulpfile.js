@@ -20,10 +20,10 @@ var htmlbeautify_options = {
 var js_scripts = [
   './node_modules/bootstrap/dist/js/bootstrap.bundle.min.js',
   './node_modules/jquery/dist/jquery.min.js',
-  './js-src/download-station.js',
-  './js-src/desktop.js',
   './js-src/verify-sid.js',
-  './js-src/login.js'
+  './js-src/sid.js',
+  './js-src/sites.js',
+  './js-src/animeflv.js'
 ];
 
 gulp.task('sass', function () {
@@ -60,8 +60,12 @@ gulp.task('join', async function () {
   gulp.src(['./generators/*.html'])
     .pipe(twig())
     .pipe(htmlbeautify(htmlbeautify_options))
+    .pipe(rename(function (path) {
+      path.extname = ".php"
+    }))
     .pipe(gulp.dest('./'));
 });
+
 
 gulp.task('watch', function () {
   gulp.watch([

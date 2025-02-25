@@ -1,0 +1,54 @@
+ul.list-group{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0 10px;
+
+  li.list-group-item{
+    width: calc(50% - 10px);
+
+    a{
+      position: relative;
+      display: block;
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 0;
+        display: block;
+        @include mask-image(url("../images/fontawesome/download-solid.svg"));
+        @include mask-repeat(no-repeat);
+        @include mask-size(15px 15px);
+        width: 15px;
+        height: 15px;
+        background: $white;
+        @include transform(translateY(-50%) translateX(0));
+      }
+    }
+    
+    span{
+      position: relative;
+      display: block;
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 0;
+        display: block;
+        @include mask-image(url("../images/fontawesome/server-solid.svg"));
+        @include mask-repeat(no-repeat);
+        @include mask-size(15px 15px);
+        width: 15px;
+        height: 15px;
+        background: $white;
+        @include transform(translateY(-50%) translateX(0));
+      }
+    }
+
+    &:last-child{
+      border-width: 0 0 var(--bs-list-group-border-width);
+    }
+  }
+}

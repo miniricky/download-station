@@ -4,13 +4,21 @@
  */
 
 (function ($) {
+  window.loginForm = '';
   document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname.includes('synology.html') || window.location.pathname.includes('login.html')) {
+    if (window.location.pathname.includes('animeflv.php')) {
       const sid = getCookie('sid');
       const domain = getCookie('domain');
 
       if (sid) {
         validateSID(sid, domain);
+      }
+
+      if (!sid) {
+        loginForm = `
+        <p>You need to add your synology credentials</p>
+        <button type="button" class="btn btn-primary" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sidModal">Open Synology form</button>
+        `;
       }
 
       /*
@@ -22,51 +30,34 @@
         return foundCookie ? foundCookie.substring((name + '=').length) : null;
       }
 
+      /*
+        * Function for delete cookie.
+        */
       function deleteCookie(name) {
         document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
       }
 
       /*
-        * Function for making POST requests.
+        * Function for validate SID.
         */
-      async function fetchData(url, params) {
-        try {
-          const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: params
-          });
-
-          if (!response.ok) {
-            throw new Error('Error in AJAX request: ' + response.statusText);
+      function validateSID(sid, domain) {
+        fetch(`../includes/sid.php?info=validate-sid&sid=${encodeURIComponent(sid)}&domain=${encodeURIComponent(domain)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            console.log(data.error);
+            return;
           }
 
-          const responseData = await response.json();
-          return responseData;
-        } catch (error) {
-          console.log('Error:', error);
-          throw error;
-        }
-      }
-
-      /*
-        * Function to validate SID.
-        */
-      async function validateSID(sid, domain) {
-        const data = `info=validate-sid&sid=${encodeURIComponent(sid)}&domain=${encodeURIComponent(domain)}`;
-        try {
-          const responseData = await fetchData('../includes/login.php', data);
-          if (responseData.validate.status === 'false') {
-            console.log(responseData.validate.message);
+          if (data.validate.status === 'false') {
+            console.log(data.validate.message);
             deleteCookie('sid');
             deleteCookie('domain');
-            window.location.href = 'login.html';
           }
-        } catch (error) {
-          console.error('Validation error:', error);
-        }
+        })
+        .catch(error => {
+          console.error("Error getting data:", error);
+        });
       }
     }
   });

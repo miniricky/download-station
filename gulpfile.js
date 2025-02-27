@@ -23,7 +23,8 @@ var js_scripts = [
   './js-src/verify-sid.js',
   './js-src/sid.js',
   './js-src/sites.js',
-  './js-src/animeflv.js'
+  './js-src/animeflv.js',
+  './js-src/animeflv-filter.js'
 ];
 
 gulp.task('sass', function () {

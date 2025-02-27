@@ -1,4 +1,236 @@
 (function ($) {
+  /*
+   * Function for insert container.
+   */
+  function insertContainer(button, container) {
+    const animeWrapper = button.closest('.anime-wrapper');
+    let animeID = button.closest('.anime').getAttribute('id');
+    const animeContainer = container.querySelector('.anime-container');
+    const allAnimeWrappers = [...container.querySelectorAll('.anime-wrapper')];
+    const index = allAnimeWrappers.indexOf(animeWrapper);
+    const itemsPerGroup = getItemsPerGroup();
+
+    const insertIndex = Math.ceil((index + 1) / itemsPerGroup) * itemsPerGroup;
+
+    document.querySelectorAll(".anime-detail").forEach(el => el.remove());
+
+    const extraContainer = document.createElement('div');
+    extraContainer.classList.add('anime-detail', 'col-12');
+    extraContainer.textContent = 'Contenedor Extra';
+
+    if (insertIndex < allAnimeWrappers.length) {
+      animeContainer.insertBefore(extraContainer, allAnimeWrappers[insertIndex]);
+    } else {
+      animeContainer.appendChild(extraContainer);
+    }
+
+    fetch(`../includes/animeflv/anime-data.php?anime_id=${animeID}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        extraContainer.textContent = 'Error al cargar la información.';
+        return;
+      }
+
+      const genres = data.genres ? (typeof data.genres === 'string' ? data.genres.split(',') : data.genres) : [];
+
+      extraContainer.innerHTML = `
+        <div class="anime">
+          <div class="image">
+            <img src="${data.image_url}" alt="${data.title}">
+          </div>
+          <div class="text">
+            <h2>${data.title}</h2>
+            <p>${data.synopsis}</p>
+            <div class="genres">
+                ${genres.map(genre => `<span class="genre">${genre}</span>`).join('')}
+            </div>
+            <ul class="nav nav-tabs" id="animeflvTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="desktop-tab" data-bs-toggle="tab" data-bs-target="#desktop-tab-pane" type="button" role="tab" aria-controls="desktop-tab-pane" aria-selected="true">Desktop</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="synology-tab" data-bs-toggle="tab" data-bs-target="#synology-tab-pane" type="button" role="tab" aria-controls="synology-tab-pane" aria-selected="false">Synology</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="animeflvTabContent">
+              <div class="tab-pane fade show active" id="desktop-tab-pane" role="tabpanel" aria-labelledby="desktop-tab" tabindex="0">
+                <ul class="list-group list-group-flush">
+                  ${data.chapters.map(ch => `<li class="list-group-item"><a class="download-desktop" href="${ch.link}" target="_blank">Episode ${ch.chapter_number}</a></li>`).join('')}
+                </ul>
+              </div>
+              <div class="tab-pane fade" id="synology-tab-pane" role="tabpanel" aria-labelledby="synology-tab" tabindex="0">
+                ${window.loginForm}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.querySelectorAll('.download-desktop').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          const url = this.getAttribute('href');
+          const episode = this.textContent;
+          const item = this.closest('.list-group-item').classList[1];
+          const title = this.closest('.text').querySelector('h2').textContent;
+          scrapingStreamtape(url, title, episode, item, 'desktop');
+        });
+      });
+
+      if (window.loginForm === '') {
+        getPath().then(status => {
+          pathStatus = status;
+          
+          if (!pathStatus) {
+            const synologyTab = container.querySelector('#synology-tab-pane');
+            const paragraph = document.createElement('p');
+            paragraph.innerHTML = 'You need to create anime shared folder in your Synology NAS and reload the page. <a href="#" class="reload-page">Click here to reload the page</a>.';
+
+            paragraph.querySelector('.reload-page').addEventListener('click', function(e) {
+              e.preventDefault();
+              window.location.reload();
+            });
+
+            synologyTab.appendChild(paragraph);
+          }
+          else{
+            const item = container.querySelectorAll('#desktop-tab-pane ul li');
+
+            let url = '&title=' + encodeURIComponent(data.title);
+            item.forEach(element => {
+              url += '&episodes[]=' + encodeURIComponent(element.querySelector('a').textContent);
+            });
+
+            validateEpisodes(url, data.chapters, container);
+          }
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error al obtener datos:', error);
+      extraContainer.textContent = 'No se pudo cargar la información.';
+    });
+  }
+
+  /*
+    * Function for get items for breakpoints.
+    */
+  function getItemsPerGroup() {
+    if (window.innerWidth < 768) {  
+      return 2;
+    } else if (window.innerWidth < 1200) {  
+      return 4;
+    } else {  
+      return 6;
+    }
+  }
+
+  /*
+   * Function for get shared folders.
+   */
+  async function getPath() {
+    try {
+      const response = await fetch(`../includes/synology.php?info=get-path`);
+      const data = await response.json();
+      
+      if (data.error) {
+        console.log(data.error);
+        return false;
+      }
+
+      return data.folder.some(element => element.path === 'anime');
+    } catch (error) {
+      console.error("Error getting data:", error);
+      return false;
+    }
+  }
+
+  /*
+       * Function for validated if episodes exist.
+       */
+  function validateEpisodes(url, charapters, container) {
+    fetch(`../includes/synology.php?info=verify-episodes${url}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        console.log(data.error);
+        return;
+      }
+
+      var status = false;
+      var episodes = [];
+
+      charapters.forEach(charapter => { 
+        var filteredCharapter = data.verify.filter(ep => ep.episode === 'Episode ' + charapter.chapter_number);
+
+        if (filteredCharapter.length !== 0) {
+          status = filteredCharapter[0].status;
+
+          episodes.push({
+            episode: charapter.chapter_number,
+            link: charapter.link,
+            status: status
+          });
+        }
+        else {
+          episodes.push({
+            episode: charapter.chapter_number,
+            link: charapter.link,
+            status: 'false'
+          });
+        }
+      });
+
+      const synology = container.querySelector('#synology-tab-pane');
+      const list = document.createElement('ul');
+      list.classList.add('list-group', 'list-group-flush');
+
+      episodes.forEach(episode => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item', 'item-'+ episode.episode);
+
+        if (episode.status === 'false') {
+          const anchor = document.createElement('a');
+          anchor.classList.add('download-synology');
+          anchor.textContent = 'Episode ' + episode.episode;
+          anchor.href = episode.link;
+
+          listItem.appendChild(anchor);              
+        }
+        else {
+          const span = document.createElement('span');
+          span.classList.add('text-white');
+          span.dataset.bsToggle = 'tooltip';
+          span.dataset.bsPlacement = 'top';
+          span.setAttribute('title', 'Episode already downloaded');
+          span.textContent = 'Episode ' + episode.episode;
+
+          listItem.appendChild(span);
+        }
+
+        list.appendChild(listItem);
+      });
+
+      synology.appendChild(list);
+
+      container.querySelectorAll('.download-synology').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          const url = this.getAttribute('href');
+          const episode = this.textContent;
+          const item = this.closest('.list-group-item').classList[1];
+          const title = this.closest('.text').querySelector('h2').textContent;
+          scrapingStreamtape(url, title, episode, item, 'synology');
+        });
+      });
+
+    })
+    .catch(error => {
+      console.error("Error getting data:", error);
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.includes('animeflv.php')) {
       const container = document.querySelector('#animeflv');
@@ -8,238 +240,6 @@
           insertContainer(this, container);
         });
       });
-
-      /*
-        * Function for insert container.
-        */
-      function insertContainer(button, container) {
-        const animeWrapper = button.closest('.anime-wrapper');
-        let animeID = button.closest('.anime').getAttribute('id');
-        const animeContainer = container.querySelector('.anime-container');
-        const allAnimeWrappers = [...container.querySelectorAll('.anime-wrapper')];
-        const index = allAnimeWrappers.indexOf(animeWrapper);
-        const itemsPerGroup = getItemsPerGroup();
-
-        const insertIndex = Math.ceil((index + 1) / itemsPerGroup) * itemsPerGroup;
-
-        document.querySelectorAll(".anime-detail").forEach(el => el.remove());
-
-        const extraContainer = document.createElement('div');
-        extraContainer.classList.add('anime-detail', 'col-12');
-        extraContainer.textContent = 'Contenedor Extra';
-
-        if (insertIndex < allAnimeWrappers.length) {
-          animeContainer.insertBefore(extraContainer, allAnimeWrappers[insertIndex]);
-        } else {
-          animeContainer.appendChild(extraContainer);
-        }
-
-        fetch(`../includes/animeflv/anime-data.php?anime_id=${animeID}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.error) {
-            extraContainer.textContent = 'Error al cargar la información.';
-            return;
-          }
-
-          const genres = data.genres ? (typeof data.genres === 'string' ? data.genres.split(',') : data.genres) : [];
-
-          extraContainer.innerHTML = `
-            <div class="anime">
-              <div class="image">
-                <img src="${data.image_url}" alt="${data.title}">
-              </div>
-              <div class="text">
-                <h2>${data.title}</h2>
-                <p>${data.synopsis}</p>
-                <div class="genres">
-                    ${genres.map(genre => `<span class="genre">${genre}</span>`).join('')}
-                </div>
-                <ul class="nav nav-tabs" id="animeflvTabs" role="tablist">
-                  <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="desktop-tab" data-bs-toggle="tab" data-bs-target="#desktop-tab-pane" type="button" role="tab" aria-controls="desktop-tab-pane" aria-selected="true">Desktop</button>
-                  </li>
-                  <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="synology-tab" data-bs-toggle="tab" data-bs-target="#synology-tab-pane" type="button" role="tab" aria-controls="synology-tab-pane" aria-selected="false">Synology</button>
-                  </li>
-                </ul>
-                <div class="tab-content" id="animeflvTabContent">
-                  <div class="tab-pane fade show active" id="desktop-tab-pane" role="tabpanel" aria-labelledby="desktop-tab" tabindex="0">
-                    <ul class="list-group list-group-flush">
-                      ${data.chapters.map(ch => `<li class="list-group-item"><a class="download-desktop" href="${ch.link}" target="_blank">Episode ${ch.chapter_number}</a></li>`).join('')}
-                    </ul>
-                  </div>
-                  <div class="tab-pane fade" id="synology-tab-pane" role="tabpanel" aria-labelledby="synology-tab" tabindex="0">
-                    ${window.loginForm}
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-
-          container.querySelectorAll('.download-desktop').forEach(button => {
-            button.addEventListener('click', function(e) {
-              e.preventDefault();
-              const url = this.getAttribute('href');
-              const episode = this.textContent;
-              const item = this.closest('.list-group-item').classList[1];
-              const title = this.closest('.text').querySelector('h2').textContent;
-              scrapingStreamtape(url, title, episode, item, 'desktop');
-            });
-          });
-
-          if (window.loginForm === '') {
-            getPath().then(status => {
-              pathStatus = status;
-              
-              if (!pathStatus) {
-                const synologyTab = container.querySelector('#synology-tab-pane');
-                const paragraph = document.createElement('p');
-                paragraph.innerHTML = 'You need to create anime shared folder in your Synology NAS and reload the page. <a href="#" class="reload-page">Click here to reload the page</a>.';
-
-                paragraph.querySelector('.reload-page').addEventListener('click', function(e) {
-                  e.preventDefault();
-                  window.location.reload();
-                });
-
-                synologyTab.appendChild(paragraph);
-              }
-              else{
-                const item = container.querySelectorAll('#desktop-tab-pane ul li');
-
-                let url = '&title=' + encodeURIComponent(data.title);
-                item.forEach(element => {
-                  url += '&episodes[]=' + encodeURIComponent(element.querySelector('a').textContent);
-                });
-
-                validateEpisodes(url, data.chapters, container);
-              }
-            });
-          }
-        })
-        .catch(error => {
-          console.error('Error al obtener datos:', error);
-          extraContainer.textContent = 'No se pudo cargar la información.';
-        });
-      }
-
-      /*
-        * Function for get items for breakpoints.
-        */
-      function getItemsPerGroup() {
-        if (window.innerWidth < 768) {  
-          return 2;
-        } else if (window.innerWidth < 1200) {  
-          return 4;
-        } else {  
-          return 6;
-        }
-      }
-
-      /*
-       * Function for get shared folders.
-       */
-      async function getPath() {
-        try {
-          const response = await fetch(`../includes/synology.php?info=get-path`);
-          const data = await response.json();
-          
-          if (data.error) {
-            console.log(data.error);
-            return false;
-          }
-
-          return data.folder.some(element => element.path === 'anime');
-        } catch (error) {
-          console.error("Error getting data:", error);
-          return false;
-        }
-      }
-      
-      /*
-       * Function for validated if episodes exist.
-       */
-      function validateEpisodes(url, charapters, container) {
-        fetch(`../includes/synology.php?info=verify-episodes${url}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.error) {
-            console.log(data.error);
-            return;
-          }
-
-          var status = false;
-          var episodes = [];
-
-          charapters.forEach(charapter => { 
-            var filteredCharapter = data.verify.filter(ep => ep.episode === 'Episode ' + charapter.chapter_number);
-
-            if (filteredCharapter.length !== 0) {
-              status = filteredCharapter[0].status;
-
-              episodes.push({
-                episode: charapter.chapter_number,
-                link: charapter.link,
-                status: status
-              });
-            }
-            else {
-              episodes.push({
-                episode: charapter.chapter_number,
-                link: charapter.link,
-                status: 'false'
-              });
-            }
-          });
-
-          const synology = container.querySelector('#synology-tab-pane');
-          const list = document.createElement('ul');
-          list.classList.add('list-group', 'list-group-flush');
-
-          episodes.forEach(episode => {
-            const listItem = document.createElement('li');
-            listItem.classList.add('list-group-item', 'item-'+ episode.episode);
-
-            if (episode.status === 'false') {
-              const anchor = document.createElement('a');
-              anchor.classList.add('download-synology');
-              anchor.textContent = 'Episode ' + episode.episode;
-              anchor.href = episode.link;
-
-              listItem.appendChild(anchor);              
-            }
-            else {
-              const span = document.createElement('span');
-              span.classList.add('text-white');
-              span.dataset.bsToggle = 'tooltip';
-              span.dataset.bsPlacement = 'top';
-              span.setAttribute('title', 'Episode already downloaded');
-              span.textContent = 'Episode ' + episode.episode;
-
-              listItem.appendChild(span);
-            }
-
-            list.appendChild(listItem);
-          });
-
-          synology.appendChild(list);
-
-          container.querySelectorAll('.download-synology').forEach(button => {
-            button.addEventListener('click', function(e) {
-              e.preventDefault();
-              const url = this.getAttribute('href');
-              const episode = this.textContent;
-              const item = this.closest('.list-group-item').classList[1];
-              const title = this.closest('.text').querySelector('h2').textContent;
-              scrapingStreamtape(url, title, episode, item, 'synology');
-            });
-          });
-
-        })
-        .catch(error => {
-          console.error("Error getting data:", error);
-        });
-      }
 
       /*
       * Function for create fetchRequest.
@@ -491,4 +491,11 @@
       });
     }
   });
+
+  window.animeflv = {
+    insertContainer,
+    getItemsPerGroup,
+    getPath
+    // Add other functions that need to be shared
+  };
 })(jQuery);

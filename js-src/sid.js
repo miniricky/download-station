@@ -73,6 +73,10 @@
             }
 
             sidForm.reset();
+
+            setTimeout(() => {
+              window.location.reload();
+            }, 100);
           }
         });
       }

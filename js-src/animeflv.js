@@ -77,6 +77,17 @@
             </div>
           `;
 
+          container.querySelectorAll('.download-desktop').forEach(button => {
+            button.addEventListener('click', function(e) {
+              e.preventDefault();
+              const url = this.getAttribute('href');
+              const episode = this.textContent;
+              const item = this.closest('.list-group-item').classList[1];
+              const title = this.closest('.text').querySelector('h2').textContent;
+              scrapingStreamtape(url, title, episode, item, 'desktop');
+            });
+          });
+
           if (window.loginForm === '') {
             getPath().then(status => {
               pathStatus = status;
@@ -84,7 +95,13 @@
               if (!pathStatus) {
                 const synologyTab = container.querySelector('#synology-tab-pane');
                 const paragraph = document.createElement('p');
-                paragraph.textContent = 'You need to create anime shared folder in your Synology NAS';
+                paragraph.innerHTML = 'You need to create anime shared folder in your Synology NAS and reload the page. <a href="#" class="reload-page">Click here to reload the page</a>.';
+
+                paragraph.querySelector('.reload-page').addEventListener('click', function(e) {
+                  e.preventDefault();
+                  window.location.reload();
+                });
+
                 synologyTab.appendChild(paragraph);
               }
               else{
@@ -207,17 +224,6 @@
 
           synology.appendChild(list);
 
-          container.querySelectorAll('.download-desktop').forEach(button => {
-            button.addEventListener('click', function(e) {
-              e.preventDefault();
-              const url = this.getAttribute('href');
-              const episode = this.textContent;
-              const item = this.closest('.list-group-item').classList[1];
-              const title = this.closest('.text').querySelector('h2').textContent;
-              scrapingStreamtape(url, title, episode, item, 'desktop');
-            });
-          });
-
           container.querySelectorAll('.download-synology').forEach(button => {
             button.addEventListener('click', function(e) {
               e.preventDefault();
@@ -226,7 +232,6 @@
               const item = this.closest('.list-group-item').classList[1];
               const title = this.closest('.text').querySelector('h2').textContent;
               scrapingStreamtape(url, title, episode, item, 'synology');
-              //sendURL(url, title, episode, item);
             });
           });
 
@@ -420,10 +425,6 @@
        * Function for add progress bar to canvas.
        */
       function createProgressBar(id, progress, item) {
-        console.log(id);
-        console.log(progress);
-        console.log(item);
-
         setTimeout(() => {
           const progressContainer = document.createElement('div');
           progressContainer.classList.add('progress', id);

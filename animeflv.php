@@ -37,6 +37,11 @@
   </nav>
   <div class="section-row" id="animeflv">
     <div class="container-fluid">
+      <div class="search-container">
+        <label for="animeSearch" class="form-label">Search</label>
+        <input class="form-control" type="search" id="animeSearch" placeholder="Type to search..." autocomplete="off">
+      </div>
+
       <div class="anime-container row row-30">
         <?php
           require_once 'includes/db.php';

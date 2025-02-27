@@ -444,6 +444,51 @@
           list.appendChild(progressContainer);
         }, 500);
       }
+
+      /*
+       * Function for search anime.
+       */
+      const searchInput = container.querySelector('#animeSearch');
+      let searchTimeout;
+      function performSearch(page = 1) {
+        const searchTerm = searchInput.value.trim();
+        const animeContainer = container.querySelector('.anime-container');
+        const paginationContainer = container.querySelector('.pagination-row nav');
+
+        fetch(`../includes/animeflv/search.php?q=${encodeURIComponent(searchTerm)}&page=${page}`)
+        .then(response => response.json())
+        .then(data => {
+          animeContainer.innerHTML = data.content;
+          paginationContainer.innerHTML = data.pagination;
+
+          container.querySelectorAll('.viewChapters').forEach(button => {
+            button.addEventListener('click', function() {
+              insertContainer(this, container);
+            });
+          });
+
+          container.querySelectorAll('.pagination .page-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+              e.preventDefault();
+              const page = this.dataset.page;
+              if (page) {
+                performSearch(parseInt(page));
+              }
+            });
+          });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          animeContainer.innerHTML = '<div class="col-12"><p>Error loading results.</p></div>';
+        });
+      }
+      
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          performSearch();
+        }, 500);
+      });
     }
   });
 })(jQuery);

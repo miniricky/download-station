@@ -37,7 +37,7 @@ function getAnimeDetails($pdo, $anime_id) {
     return null;
   }
 
-  $sqlChapters = "SELECT name, chapter_number, link FROM anime_chapters WHERE anime_id = :anime_id ORDER BY chapter_number ASC";
+  $sqlChapters = "SELECT chapter_number, link FROM anime_chapters WHERE anime_id = :anime_id ORDER BY chapter_number ASC";
   $stmt = $pdo->prepare($sqlChapters);
   $stmt->bindParam(':anime_id', $anime_id, PDO::PARAM_INT);
   $stmt->execute();

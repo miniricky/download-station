@@ -42,7 +42,7 @@
             return;
           }
 
-          const genres = typeof data.genres === 'string' ? data.genres.split(',') : data.genres;
+          const genres = data.genres ? (typeof data.genres === 'string' ? data.genres.split(',') : data.genres) : [];
 
           extraContainer.innerHTML = `
             <div class="anime">
@@ -66,7 +66,7 @@
                 <div class="tab-content" id="animeflvTabContent">
                   <div class="tab-pane fade show active" id="desktop-tab-pane" role="tabpanel" aria-labelledby="desktop-tab" tabindex="0">
                     <ul class="list-group list-group-flush">
-                      ${data.chapters.map(ch => `<li class="list-group-item"><a href="/includes/download-file.php?url=${encodeURIComponent('https:' + ch.link)}&filename=${encodeURIComponent(data.title + ' - episode' + ch.chapter_number + '.mp4')}" target="_blank">Episode ${ch.chapter_number}</a></li>`).join('')}
+                      ${data.chapters.map(ch => `<li class="list-group-item"><a class="download-desktop" href="${ch.link}" target="_blank">Episode ${ch.chapter_number}</a></li>`).join('')}
                     </ul>
                   </div>
                   <div class="tab-pane fade" id="synology-tab-pane" role="tabpanel" aria-labelledby="synology-tab" tabindex="0">
@@ -161,7 +161,6 @@
               status = filteredCharapter[0].status;
 
               episodes.push({
-                name: charapter.name,
                 episode: charapter.chapter_number,
                 link: charapter.link,
                 status: status
@@ -169,7 +168,6 @@
             }
             else {
               episodes.push({
-                name: charapter.name,
                 episode: charapter.chapter_number,
                 link: charapter.link,
                 status: 'false'
@@ -187,10 +185,9 @@
 
             if (episode.status === 'false') {
               const anchor = document.createElement('a');
-              anchor.classList.add('download-link');
-              anchor.name = episode.name;
+              anchor.classList.add('download-synology');
               anchor.textContent = 'Episode ' + episode.episode;
-              anchor.href = encodeURIComponent('https:' + episode.link);
+              anchor.href = episode.link;
 
               listItem.appendChild(anchor);              
             }
@@ -210,16 +207,26 @@
 
           synology.appendChild(list);
 
-          container.querySelectorAll('.download-link').forEach(button => {
+          container.querySelectorAll('.download-desktop').forEach(button => {
             button.addEventListener('click', function(e) {
               e.preventDefault();
               const url = this.getAttribute('href');
-              const name = this.name;
               const episode = this.textContent;
               const item = this.closest('.list-group-item').classList[1];
               const title = this.closest('.text').querySelector('h2').textContent;
+              scrapingStreamtape(url, title, episode, item, 'desktop');
+            });
+          });
 
-              sendURL(url, title, episode, name, item);
+          container.querySelectorAll('.download-synology').forEach(button => {
+            button.addEventListener('click', function(e) {
+              e.preventDefault();
+              const url = this.getAttribute('href');
+              const episode = this.textContent;
+              const item = this.closest('.list-group-item').classList[1];
+              const title = this.closest('.text').querySelector('h2').textContent;
+              scrapingStreamtape(url, title, episode, item, 'synology');
+              //sendURL(url, title, episode, item);
             });
           });
 
@@ -255,6 +262,48 @@
       }
 
       /*
+       * Function for scraping download link.
+       */
+      function scrapingStreamtape(scrapeUrl, title, episode, item, type) {
+        const url = 'http://localhost:3000/scrape/streamtape';
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: scrapeUrl })
+        })
+        .then(response => {
+          if (!response.ok) {
+            if (response.status === 400) {
+              const errorMessage = 'page is unreachable.';
+              console.log(errorMessage);
+              return Promise.reject('Page is unreachable');
+            }
+
+            return Promise.reject(new Error('Bad Request'));
+          }
+
+          return response.json();
+        })
+        .then(result => {
+          if (result && result.data && result.data.status === true) {
+            if (type === 'desktop') {
+              const url = `/includes/download-file.php?url=${encodeURIComponent("https:" + result.data.src)}&filename=${encodeURIComponent(title + " - "  + episode + ".mp4")}`;
+              window.open(url, '_blank');
+            } else {
+              sendURL("https:" + result.data.src, title, episode, result.data.title, item);
+            }
+          } else {
+            console.log('Download link not found.');
+          }
+        })
+        .catch(error => {
+          if (error !== 'Page is unreachable' && error.message !== 'Bad Request') {
+            console.log('Error in scrapingStreamtape:', error);
+          }
+        });
+      }
+
+      /*
        * Function for send the download url.
        */
       function sendURL(url, title, episode, name, item) {
@@ -284,8 +333,6 @@
               console.log('Error in idDownload:', err);
               return;
             }
-
-            console.log(responseData);
 
             if (responseData.id.download == 'downloading') {
               const id = responseData.id.id;
@@ -342,7 +389,7 @@
               clearInterval(intervalInfo);
 
               const list = document.querySelector('.list-group-item.' + item);
-              const downloadLink = list.querySelector('.download-link');
+              const downloadLink = list.querySelector('.download-synology');
               const span = document.createElement('span');
               span.classList.add('text-white');
               span.dataset.bsToggle = 'tooltip';
@@ -366,8 +413,6 @@
             console.log('Error in renameFile:', err);
             return;
           }
-
-          console.log(responseData);
         });
       }
 

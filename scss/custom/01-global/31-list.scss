@@ -5,7 +5,17 @@ ul.list-group{
   gap: 0 10px;
 
   li.list-group-item{
-    width: calc(50% - 10px);
+    width: calc(50% - 5px);
+    padding: 0;
+    
+    a,
+    span{
+      padding: 16px 35px 16px 16px;
+
+      + *{
+        margin-top: 5px;
+      }
+    }
 
     a{
       position: relative;
@@ -15,7 +25,7 @@ ul.list-group{
         content: '';
         position: absolute;
         top: 50%;
-        right: 0;
+        right: 10px;
         display: block;
         @include mask-image(url("../images/fontawesome/download-solid.svg"));
         @include mask-repeat(no-repeat);
@@ -35,7 +45,7 @@ ul.list-group{
         content: '';
         position: absolute;
         top: 50%;
-        right: 0;
+        right: 10px;
         display: block;
         @include mask-image(url("../images/fontawesome/server-solid.svg"));
         @include mask-repeat(no-repeat);
@@ -49,6 +59,12 @@ ul.list-group{
 
     &:last-child{
       border-width: 0 0 var(--bs-list-group-border-width);
+    }
+
+    &:has(a){
+      &:hover{
+        background-color: rgba(255, 255, 255, 0.1);
+      }
     }
   }
 }

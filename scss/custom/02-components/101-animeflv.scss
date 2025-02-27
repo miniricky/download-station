@@ -143,15 +143,6 @@
             > p{
               margin-top: 15px;
             }
-
-            .list-group-item{
-              a,
-              span{
-                + *{
-                  margin-top: 5px;
-                }
-              }
-            }
           }
         }
       }

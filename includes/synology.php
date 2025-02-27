@@ -142,7 +142,7 @@ function verifyFolder($title, $url, $episode, $sid, $domain) {
   $download = [];
 
   if ($create_folder_data['success']) {
-    $download = initDownload($sid, $url, rawurlencode($pathEncode), $episode, $domain);
+    $download = initDownload($sid, rawurlencode($url), rawurlencode($pathEncode), $episode, $domain);
   } else {
     $download = [
       'error' => 'Error creating folder: ' . $create_folder_data['error']['code']

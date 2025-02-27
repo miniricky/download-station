@@ -124,12 +124,7 @@ function getAnimes($pdo, $url, $site_id, $status) {
       $type = trim($typeNode->item(0)->nodeValue);
       $link = 'https://www3.animeflv.net/' . trim($linkNode->item(0)->nodeValue);
       $urlImage = trim($urlNode->item(0)->nodeValue);
-
-      $extraData = getAnimeDetails($link);
-      $synopsis = $extraData['data']['synopsis'];
-      $chapters = $extraData['data']['episodes'];
-      $genres = $extraData['data']['genres'];
-      saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $synopsis, $status, $chapters, $genres);
+      saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $status);
     }
   }
 
@@ -139,17 +134,22 @@ function getAnimes($pdo, $url, $site_id, $status) {
 /* 
  * Function for save animes
  */
-function saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $synopsis, $status, $chapters, $genres) {
+function saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $status) {
   try {
-    $imagePath = __DIR__ . '/images/';
-    $imageSaved = downloadImage($urlImage, $imagePath, $title);
-
     $sql = "SELECT COUNT(*) FROM animes WHERE link = :link";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(["link" => $link]);
     $exist = $stmt->fetchColumn();
 
     if ($exist == 0) {
+      $imagePath = __DIR__ . '/images/';
+      $imageSaved = downloadImage($urlImage, $imagePath, $title);
+
+      $extraData = getAnimeDetails($link);
+      $synopsis = $extraData['data']['synopsis'];
+      $chapters = $extraData['data']['episodes'];
+      $genres = $extraData['data']['genres'];
+
       $sql = "INSERT INTO animes (site_id, title, type, link, image_url, synopsis, status) VALUES (:site_id, :title, :type, :link, :image_url, :synopsis, :status)";
       $stmt = $pdo->prepare($sql);
       $stmt->execute([
@@ -164,26 +164,15 @@ function saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $synopsis, $
       $anime_id = $pdo->lastInsertId();
 
       foreach ($chapters as $key => $chapter) {
-        $streamtapeData = scrapingEpisode($chapter['link']);
-
-        if (isset($streamtapeData['data']['src']) && !empty($streamtapeData['data']['src'])) {
-          $finalLink = $streamtapeData['data']['src'];
-          $title = $streamtapeData['data']['title'];
-        } else {
-          $title = null;
-          $finalLink = null;
-        }
-
-        if ($finalLink) {
-          $sql = "INSERT INTO anime_chapters (name, anime_id, chapter_number, link) VALUES (:name, :anime_id, :chapter_number, :link)";
-          $stmt = $pdo->prepare($sql);
-          $stmt->execute([
-            "name" => $title,
-            "anime_id" => $anime_id,
-            "chapter_number" => $key + 1,
-            "link" => $finalLink
-          ]);
-        }
+        $streamtapeLink = scrapingEpisode($chapter['link']);
+      
+        $sql = "INSERT INTO anime_chapters (anime_id, chapter_number, link) VALUES (:anime_id, :chapter_number, :link)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+          "anime_id" => $anime_id,
+          "chapter_number" => $key + 1,
+          "link" => $streamtapeLink
+        ]);
       }
   
       foreach ($genres as $genre) {
@@ -257,7 +246,7 @@ function scrapingEpisode($url) {
       $link = $article->nodeValue;
 
       if (strpos($link, 'https://streamtape.com/') !== false) {
-        return scrapingStreamtape($link);
+        return $link;
       }
     }
   }

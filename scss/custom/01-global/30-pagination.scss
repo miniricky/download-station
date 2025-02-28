@@ -1,20 +1,30 @@
 ul.pagination{
   flex-wrap: wrap;
-  gap: 10px 0;
+  gap: 10px 5px;
   justify-content: center;
   margin-bottom: 0;
 
   li.page-item{
+    a.page-link{
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      @include border-radius(50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
     &:first-child{
       a.page-link{
         position: relative;
-        padding: 6px 12px 6px 20px;
+        text-indent: -9999999999px;
 
         &:after {
           content: '';
           position: absolute;
           top: 50%;
-          left: 0;
+          left: 50%;
           display: block;
           @include mask-image(url("../images/fontawesome/angle-left-solid.svg"));
           @include mask-repeat(no-repeat);
@@ -22,7 +32,7 @@ ul.pagination{
           width: 15px;
           height: 15px;
           background: $white;
-          @include transform(translateY(-50%) translateX(0));
+          @include transform(translate(-50%, -50%));
         }
       }
     }
@@ -30,13 +40,13 @@ ul.pagination{
     &:last-child{
       a.page-link{
         position: relative;
-        padding: 6px 20px 6px 12px;
+        text-indent: -9999999999px;
 
         &:after {
           content: '';
           position: absolute;
           top: 50%;
-          right: 0;
+          left: 50%;
           display: block;
           @include mask-image(url("../images/fontawesome/angle-right-solid.svg"));
           @include mask-repeat(no-repeat);
@@ -44,7 +54,7 @@ ul.pagination{
           width: 15px;
           height: 15px;
           background: $white;
-          @include transform(translateY(-50%) translateX(0));
+          @include transform(translate(-50%, -50%));
         }
       }
     }

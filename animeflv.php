@@ -11,10 +11,10 @@
   <link href="./css/style.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-dark text-white d-flex flex-column vh-100">
-  <nav class="navbar navbar-expand-lg navbar-dark border-bottom">
+<body class="bg-purple text-white d-flex flex-column vh-100">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-purple-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">Download Station</a>
+      <a class="navbar-brand" href="/">Download <span class="text-danger">Station</span></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -42,7 +42,7 @@
     $items_per_page = 24;
   ?>
     <div class="container-fluid">
-      <h2 class="title">AnimeFLV</h2>
+      <h1 class="title">AnimeFLV</h1>
 
       <div class="row row-30 flex-lg-row-reverse">
         <div class="sidebar col-12 col-lg-4 col-xl-3">
@@ -67,14 +67,22 @@
               $genres_stmt->execute();
               $genres = $genres_stmt->fetchAll(PDO::FETCH_COLUMN);
             ?>
-              <label class="form-label">Genres</label>
-              <div class="btn-group flex-wrap" role="group">
-                <?php foreach ($genres as $genre): ?>
-                <input type="checkbox" class="btn-check genre-filter" name="genre[]" id="genre_<?php echo htmlspecialchars($genre); ?>" value="<?php echo htmlspecialchars($genre); ?>" <?php echo (isset($_GET['genre']) && in_array($genre, $_GET['genre'])) ? 'checked' : ''; ?>>
-                <label class="btn btn-sm" for="genre_<?php echo htmlspecialchars($genre); ?>">
-                  <?php echo htmlspecialchars($genre); ?>
-                </label>
-                <?php endforeach; ?>
+              <div class="dropdown w-100">
+                <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Select Genres
+                </button>
+                <ul class="dropdown-menu w-100">
+                  <?php foreach ($genres as $genre): ?>
+                  <li class="dropdown-item">
+                    <div class="form-check">
+                      <input class="form-check-input genre-filter" type="checkbox" name="genre[]" id="genre_<?php echo htmlspecialchars($genre); ?>" value="<?php echo htmlspecialchars($genre); ?>" <?php echo (isset($_GET['genre']) && in_array($genre, $_GET['genre'])) ? 'checked' : ''; ?>>
+                      <label class="form-check-label w-100" for="genre_<?php echo htmlspecialchars($genre); ?>">
+                        <?php echo htmlspecialchars($genre); ?>
+                      </label>
+                    </div>
+                  </li>
+                  <?php endforeach; ?>
+                </ul>
               </div>
             </div>
           </div>
@@ -239,9 +247,9 @@
       </div>
     </div>
   </div>
-  <footer class="footer mt-auto py-3 text-center border-top">
+  <footer class="footer mt-auto py-3 text-center bg-purple-dark">
     <div class="container">
-      <span>© Copyright 2025 — Download Station. All rights reserved. Created by <a href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
+      <span>© Copyright 2025 — Download Station. All rights reserved. Created by <a class="underline-link" href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
     </div>
   </footer>
   <script src="./js/scripts-all.min.js"></script>

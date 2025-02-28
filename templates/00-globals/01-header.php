@@ -1,6 +1,6 @@
-<nav class="navbar navbar-expand-lg navbar-dark border-bottom">
+<nav class="navbar navbar-expand-lg navbar-dark bg-purple-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/">Download Station</a>
+    <a class="navbar-brand" href="/">Download <span class="text-danger">Station</span></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>

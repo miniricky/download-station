@@ -11,10 +11,10 @@
   <link href="./css/style.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-dark text-white d-flex flex-column vh-100">
-  <nav class="navbar navbar-expand-lg navbar-dark border-bottom">
+<body class="bg-purple text-white d-flex flex-column vh-100">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-purple-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">Download Station</a>
+      <a class="navbar-brand" href="/">Download <span class="text-danger">Station</span></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -48,9 +48,9 @@
       </div>
     </div>
   </div>
-  <footer class="footer mt-auto py-3 text-center border-top">
+  <footer class="footer mt-auto py-3 text-center bg-purple-dark">
     <div class="container">
-      <span>© Copyright 2025 — Download Station. All rights reserved. Created by <a href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
+      <span>© Copyright 2025 — Download Station. All rights reserved. Created by <a class="underline-link" href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
     </div>
   </footer>
   <script src="./js/scripts-all.min.js"></script>

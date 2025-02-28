@@ -1,27 +1,10 @@
 .filters-container{
-  label{
-    margin-bottom: 0;
+  .dropdown-menu{
+    max-height: 400px;
+    overflow: auto;
   }
 
-  .btn-group{
-    gap: 5px;
-
-    input{
-      &:checked + label{
-        background-color: $white;
-        color: $black;
-      }
-    }
-
-    label{
-      color: $white;
-      background-color: transparent;
-      border-color: $white;
-
-      &:hover{
-        background-color: $white;
-        color: $black;
-      }
-    }
+  label{
+    margin-bottom: 0;
   }
 }

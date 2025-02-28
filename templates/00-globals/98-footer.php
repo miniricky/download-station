@@ -1,5 +1,5 @@
-<footer class="footer mt-auto py-3 text-center border-top">
+<footer class="footer mt-auto py-3 text-center bg-purple-dark">
   <div class="container">
-    <span>© Copyright 2025 — Download Station. All rights reserved. Created by <a href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
+    <span>© Copyright 2025 — Download Station. All rights reserved. Created by <a class="underline-link" href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
   </div>
 </footer>

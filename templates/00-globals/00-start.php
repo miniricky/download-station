@@ -10,4 +10,4 @@
     <link href="./css/style.min.css" rel="stylesheet">
   </head>
 
-  <body class="bg-dark text-white d-flex flex-column vh-100">
+  <body class="bg-purple text-white d-flex flex-column vh-100">

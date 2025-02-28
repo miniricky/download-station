@@ -68,7 +68,7 @@ try {
   $content = '';
   if ($animes) {
     foreach ($animes as $anime) {
-      $content .= '<div class="anime-wrapper col-6 col-md-3 col-xl-2">';
+      $content .= '<div class="anime-wrapper col-6 col-md-3 col-lg-4 col-xl-3">';
       $content .= '<div class="anime" id="' . $anime['id'] . '">';
       $content .= '<div class="image"><img src="' . $anime['image_url'] . '" width="100"></div>';
       $content .= '<div class="status"><span class="type">' . $anime['type'] . '</span>';

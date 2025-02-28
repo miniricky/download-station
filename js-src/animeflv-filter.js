@@ -30,7 +30,7 @@
         fetch(`../includes/animeflv/filter.php?${searchParams.toString()}`)
           .then(response => response.json())
           .then(data => {
-            const animeContainer = container.querySelector('.anime-container');
+            const animeContainer = container.querySelector('.anime-container .row');
             const paginationContainer = container.querySelector('.pagination-row nav');
             
             animeContainer.innerHTML = data.content;
@@ -52,6 +52,13 @@
         // Reattach viewChapters listeners
         container.querySelectorAll('.viewChapters').forEach(button => {
           button.addEventListener('click', function() {
+            const animeId = this.closest('.anime').getAttribute('id');
+            const existingDetail = document.querySelector('.anime-detail');
+            
+            if (existingDetail && existingDetail.getAttribute('data-anime-id') === animeId) {
+              return;
+            }
+
             window.animeflv.insertContainer(this, container);
           });
         });

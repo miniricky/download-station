@@ -101,10 +101,35 @@ try {
   }
   $pagination .= '</ul>';
 
+  // ... código existente hasta antes del json_encode ...
+  
+  // Obtener géneros disponibles
+  $genres_sql = "SELECT DISTINCT ag.genre 
+                 FROM anime_genres ag
+                 JOIN animes a ON ag.anime_id = a.id
+                 JOIN sites s ON a.site_id = s.id
+                 WHERE s.name = :site_name";
+
+  // Si hay búsqueda, filtrar géneros por los animes que coinciden
+  if (isset($_GET['search']) && !empty($_GET['search'])) {
+      $genres_sql .= " AND a.title LIKE :search_term";
+  }
+
+  $genres_sql .= " ORDER BY ag.genre";
+
+  $genres_stmt = $pdo->prepare($genres_sql);
+  $genres_stmt->bindValue(':site_name', $site_name);
+  if (isset($_GET['search']) && !empty($_GET['search'])) {
+      $genres_stmt->bindValue(':search_term', '%' . $_GET['search'] . '%');
+  }
+  $genres_stmt->execute();
+  $available_genres = $genres_stmt->fetchAll(PDO::FETCH_COLUMN);
+
   echo json_encode([
-    'content' => $content,
-    'pagination' => $pagination,
-    'total' => $total_rows
+      'content' => $content,
+      'pagination' => $pagination,
+      'total' => $total_rows,
+      'available_genres' => $available_genres
   ]);
 
 } catch (PDOException $e) {

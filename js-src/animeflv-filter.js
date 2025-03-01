@@ -2,29 +2,28 @@
   document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.includes('animeflv.php')) {
       const container = document.querySelector('#animeflv');
-      const checkboxes = container.querySelectorAll('.genre-filter');
-      const searchInput = container.querySelector('#animeSearch');
       let searchTimeout;
 
-      function updateContent(page = 1) {
-        const selectedGenres = [];
+      function updateContent(page = 1, isSearch = false) {
+        const searchInput = container.querySelector('#animeSearch');
+        const checkboxes = container.querySelectorAll('.genre-filter');
         const searchTerm = searchInput.value.trim();
-        
-        checkboxes.forEach(checkbox => {
-          if (checkbox.checked) {
-            selectedGenres.push(checkbox.value);
-          }
-        });
-
         const searchParams = new URLSearchParams();
-        if (selectedGenres.length > 0) {
-          selectedGenres.forEach(genre => {
-            searchParams.append('genre[]', genre);
+        
+        if (isSearch) {
+          checkboxes.forEach(checkbox => checkbox.checked = false);
+          if (searchTerm) {
+            searchParams.append('search', searchTerm);
+          }
+        } else {
+          searchInput.value = '';
+          checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+              searchParams.append('genre[]', checkbox.value);
+            }
           });
         }
-        if (searchTerm) {
-          searchParams.append('search', searchTerm);
-        }
+
         searchParams.append('page', page);
 
         fetch(`../includes/animeflv/filter.php?${searchParams.toString()}`)
@@ -36,55 +35,49 @@
             animeContainer.innerHTML = data.content;
             paginationContainer.innerHTML = data.pagination;
 
-            // Reattach event listeners
-            reattachEventListeners();
-
-            // Update URL without reloading
-            const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
-            window.history.pushState({ path: newUrl }, '', newUrl);
+            reattachEventListeners(isSearch);
           })
-          .catch(error => {
-            console.error('Error:', error);
-          });
+          .catch(error => console.error('Error:', error));
       }
 
-      function reattachEventListeners() {
-        // Reattach viewChapters listeners
+      function attachFilterListeners() {
+        container.querySelectorAll('.genre-filter').forEach(checkbox => {
+          checkbox.addEventListener('change', () => updateContent(1, false));
+        });
+      }
+
+      function reattachEventListeners(isSearch) {
         container.querySelectorAll('.viewChapters').forEach(button => {
           button.addEventListener('click', function() {
             const animeId = this.closest('.anime').getAttribute('id');
             const existingDetail = document.querySelector('.anime-detail');
-            
             if (existingDetail && existingDetail.getAttribute('data-anime-id') === animeId) {
               return;
             }
-
             window.animeflv.insertContainer(this, container);
           });
         });
 
-        // Reattach pagination listeners
         container.querySelectorAll('.pagination .page-link').forEach(link => {
           link.addEventListener('click', function(e) {
             e.preventDefault();
             const page = this.dataset.page;
             if (page) {
-              updateContent(parseInt(page));
+              updateContent(parseInt(page), isSearch);
             }
           });
         });
       }
 
-      // Add change event listener to checkboxes
-      checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', () => updateContent());
-      });
+      // Initial attachment of filter listeners
+      attachFilterListeners();
 
-      // Add input event listener to search
+      // Search listener
+      const searchInput = container.querySelector('#animeSearch');
       searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-          updateContent();
+          updateContent(1, true);
         }, 500);
       });
     }

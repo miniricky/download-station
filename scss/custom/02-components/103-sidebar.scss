@@ -1,0 +1,34 @@
+.sidebar{
+  .sticky-lg-top{
+    top: 20px;
+
+    .search-container{
+      label{
+        margin-bottom: 0;
+        padding: 2px 2px 2px 5px;
+        border-left: 3px solid #e53637;
+
+        + *{
+          margin-top: 10px;
+        }
+      }
+
+      + *{
+        margin-top: 30px;
+      }
+    }
+
+    .filters-container{
+      h2{
+        padding: 2px 2px 2px 5px;
+        border-left: 3px solid #e53637;
+      }
+
+      .genres-wrapper{
+        + *{
+          margin-top: 10px;
+        }
+      }
+    }
+  }
+}

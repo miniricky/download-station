@@ -48,11 +48,13 @@
         <div class="sidebar col-12 col-lg-4 col-xl-3">
           <div class="sticky-lg-top">
             <div class="search-container">
-              <label for="animeSearch" class="form-label">Search</label>
+              <label for="animeSearch" class="form-label h4">Search</label>
               <input class="form-control" type="search" id="animeSearch" placeholder="Type to search..." autocomplete="off">
             </div>
 
             <div class="filters-container">
+              <h2 class="h4">Filters</h2>
+
               <div class="genres-wrapper">
                 <?php
                 // Get unique genres
@@ -101,7 +103,7 @@
                 $status_stmt->execute();
                 $statuses = $status_stmt->fetchAll(PDO::FETCH_COLUMN);
               ?>
-                <div class="dropdown w-100 mt-3">
+                <div class="dropdown w-100">
                   <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Select Status
                   </button>
@@ -134,83 +136,83 @@
             $offset = ($current_page - 1) * $items_per_page;
 
             try {
-                $where_conditions = ["sites.name = :site_name"];
-                $params = [':site_name' => $site_name];
-        
-                // Add genre filters if selected
-                if (isset($_GET['genre']) && !empty($_GET['genre'])) {
-                    $genre_placeholders = [];
-                    foreach ($_GET['genre'] as $key => $genre) {
-                        $placeholder = ":genre$key";
-                        $genre_placeholders[] = $placeholder;
-                        $params[$placeholder] = $genre;
-                    }
-                    $where_conditions[] = "EXISTS (
-                        SELECT 1 FROM anime_genres ag 
-                        WHERE ag.anime_id = animes.id 
-                        AND ag.genre IN (" . implode(',', $genre_placeholders) . ")
-                    )";
+              $where_conditions = ["sites.name = :site_name"];
+              $params = [':site_name' => $site_name];
+      
+              // Add genre filters if selected
+              if (isset($_GET['genre']) && !empty($_GET['genre'])) {
+                $genre_placeholders = [];
+                foreach ($_GET['genre'] as $key => $genre) {
+                  $placeholder = ":genre$key";
+                  $genre_placeholders[] = $placeholder;
+                  $params[$placeholder] = $genre;
                 }
+                $where_conditions[] = "EXISTS (
+                  SELECT 1 FROM anime_genres ag 
+                  WHERE ag.anime_id = animes.id 
+                  AND ag.genre IN (" . implode(',', $genre_placeholders) . ")
+                )";
+              }
 
-                // Add status filters if selected
-                if (isset($_GET['status']) && !empty($_GET['status'])) {
-                    $status_placeholders = [];
-                    foreach ($_GET['status'] as $key => $status) {
-                        $placeholder = ":status$key";
-                        $status_placeholders[] = $placeholder;
-                        $params[$placeholder] = $status;
-                    }
-                    $where_conditions[] = "animes.status IN (" . implode(',', $status_placeholders) . ")";
+              // Add status filters if selected
+              if (isset($_GET['status']) && !empty($_GET['status'])) {
+                $status_placeholders = [];
+                foreach ($_GET['status'] as $key => $status) {
+                  $placeholder = ":status$key";
+                  $status_placeholders[] = $placeholder;
+                  $params[$placeholder] = $status;
                 }
-        
-                $where_clause = implode(' AND ', $where_conditions);
-        
-                // Modify count query
-                $count_sql = "SELECT COUNT(DISTINCT animes.id) as total 
-                              FROM animes 
-                              JOIN sites ON animes.site_id = sites.id 
-                              WHERE $where_clause";
-                
-                $count_stmt = $pdo->prepare($count_sql);
-                foreach ($params as $key => $value) {
-                    $count_stmt->bindValue($key, $value);
+                $where_conditions[] = "animes.status IN (" . implode(',', $status_placeholders) . ")";
+              }
+      
+              $where_clause = implode(' AND ', $where_conditions);
+      
+              // Modify count query
+              $count_sql = "SELECT COUNT(DISTINCT animes.id) as total 
+                            FROM animes 
+                            JOIN sites ON animes.site_id = sites.id 
+                            WHERE $where_clause";
+              
+              $count_stmt = $pdo->prepare($count_sql);
+              foreach ($params as $key => $value) {
+                $count_stmt->bindValue($key, $value);
+              }
+              $count_stmt->execute();
+              $total_rows = $count_stmt->fetch(PDO::FETCH_ASSOC)['total'];
+              $total_pages = ceil($total_rows / $items_per_page);
+      
+              // Modify main query
+              $sql = "SELECT DISTINCT animes.*, sites.name AS site_name, sites.url AS site_url
+                      FROM animes
+                      JOIN sites ON animes.site_id = sites.id
+                      WHERE $where_clause
+                      LIMIT :limit OFFSET :offset";
+              
+              $stmt = $pdo->prepare($sql);
+              foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+              }
+              $stmt->bindValue(':limit', $items_per_page, PDO::PARAM_INT);
+              $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+              $stmt->execute();
+              
+              $animes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+              
+              if ($animes) {
+                foreach ($animes as $anime) {
+                  echo '<div class="anime-wrapper col-6 col-md-3 col-lg-4 col-xl-3">';
+                  echo '<div class="anime" id="' . $anime['id']  . '">';  
+                  echo '<div class="image"><img src="' . $anime['image_url'] . '" width="100"></div>';
+                  echo '<div class="status"><span class="type">' . $anime['type'] . '</span>';
+                  echo '<span class="type">' . $anime['status'] . '</span></div>';
+                  echo '<div class="text">';
+                  echo '<h2 class="h6">' . $anime['title'] . '</h2></div>';
+                  echo '<button type="button" class="btn btn-link viewChapters">Charapters</button>';
+                  echo "</div></div>";
                 }
-                $count_stmt->execute();
-                $total_rows = $count_stmt->fetch(PDO::FETCH_ASSOC)['total'];
-                $total_pages = ceil($total_rows / $items_per_page);
-        
-                // Modify main query
-                $sql = "SELECT DISTINCT animes.*, sites.name AS site_name, sites.url AS site_url
-                        FROM animes
-                        JOIN sites ON animes.site_id = sites.id
-                        WHERE $where_clause
-                        LIMIT :limit OFFSET :offset";
-                
-                $stmt = $pdo->prepare($sql);
-                foreach ($params as $key => $value) {
-                    $stmt->bindValue($key, $value);
-                }
-                $stmt->bindValue(':limit', $items_per_page, PDO::PARAM_INT);
-                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-                $stmt->execute();
-                
-                $animes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                
-                if ($animes) {
-                  foreach ($animes as $anime) {
-                    echo '<div class="anime-wrapper col-6 col-md-3 col-lg-4 col-xl-3">';
-                    echo '<div class="anime" id="' . $anime['id']  . '">';  
-                    echo '<div class="image"><img src="' . $anime['image_url'] . '" width="100"></div>';
-                    echo '<div class="status"><span class="type">' . $anime['type'] . '</span>';
-                    echo '<span class="type">' . $anime['status'] . '</span></div>';
-                    echo '<div class="text">';
-                    echo '<h2 class="h6">' . $anime['title'] . '</h2></div>';
-                    echo '<button type="button" class="btn btn-link viewChapters">Charapters</button>';
-                    echo "</div></div>";
-                  }
-                } else {
-                  echo "No animes found for the site '$site_name'.";
-                }
+              } else {
+                echo "No animes found for the site '$site_name'.";
+              }
             } catch (PDOException $e) {
               echo "Error in query: " . $e->getMessage();
             }

@@ -9,20 +9,6 @@
   }
 
   .sidebar{
-    .sticky-lg-top{
-      top: 20px;
-
-      .search-container{
-        label{
-          margin-bottom: 0;
-        }
-
-        + *{
-          margin-top: 10px;
-        }
-      }
-    }
-
     + *{
       margin-top: 20px;
     }

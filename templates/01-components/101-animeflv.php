@@ -11,11 +11,13 @@
       <div class="sidebar col-12 col-lg-4 col-xl-3">
         <div class="sticky-lg-top">
           <div class="search-container">
-            <label for="animeSearch" class="form-label">Search</label>
+            <label for="animeSearch" class="form-label h4">Search</label>
             <input class="form-control" type="search" id="animeSearch" placeholder="Type to search..." autocomplete="off">
           </div>
 
           <div class="filters-container">
+            <h2 class="h4">Filters</h2>
+
             <div class="genres-wrapper">
               <?php
                 // Get unique genres
@@ -67,7 +69,7 @@
                 $status_stmt->execute();
                 $statuses = $status_stmt->fetchAll(PDO::FETCH_COLUMN);
               ?>
-              <div class="dropdown w-100 mt-3">
+              <div class="dropdown w-100">
                 <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Select Status
                 </button>

@@ -16,39 +16,77 @@
           </div>
 
           <div class="filters-container">
-            <?php
-              // Get unique genres
-              $genres_sql = "SELECT DISTINCT ag.genre 
-              FROM anime_genres ag
-              JOIN animes a ON ag.anime_id = a.id
-              JOIN sites s ON a.site_id = s.id
-              WHERE s.name = :site_name
-              ORDER BY ag.genre";
-              
-              $genres_stmt = $pdo->prepare($genres_sql);
-              $genres_stmt->bindParam(':site_name', $site_name, PDO::PARAM_STR);
-              $genres_stmt->execute();
-              $genres = $genres_stmt->fetchAll(PDO::FETCH_COLUMN);
-            ?>
-            <div class="dropdown w-100">
-              <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Select Genres
-              </button>
-              <ul class="dropdown-menu w-100">
-                <?php foreach ($genres as $genre): ?>
-                  <li class="dropdown-item">
-                    <div class="form-check">
-                      <input class="form-check-input genre-filter" type="checkbox" name="genre[]" 
-                        id="genre_<?php echo htmlspecialchars($genre); ?>" 
-                        value="<?php echo htmlspecialchars($genre); ?>"
-                        <?php echo (isset($_GET['genre']) && in_array($genre, $_GET['genre'])) ? 'checked' : ''; ?>>
-                      <label class="form-check-label w-100" for="genre_<?php echo htmlspecialchars($genre); ?>">
-                        <?php echo htmlspecialchars($genre); ?>
-                      </label>
-                    </div>
-                  </li>
-                <?php endforeach; ?>
-              </ul>
+            <div class="genres-wrapper">
+              <?php
+                // Get unique genres
+                $genres_sql = "SELECT DISTINCT ag.genre 
+                FROM anime_genres ag
+                JOIN animes a ON ag.anime_id = a.id
+                JOIN sites s ON a.site_id = s.id
+                WHERE s.name = :site_name
+                ORDER BY ag.genre";
+                
+                $genres_stmt = $pdo->prepare($genres_sql);
+                $genres_stmt->bindParam(':site_name', $site_name, PDO::PARAM_STR);
+                $genres_stmt->execute();
+                $genres = $genres_stmt->fetchAll(PDO::FETCH_COLUMN);
+              ?>
+              <div class="dropdown w-100">
+                <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Select Genres
+                </button>
+                <ul class="dropdown-menu w-100">
+                  <?php foreach ($genres as $genre): ?>
+                    <li class="dropdown-item">
+                      <div class="form-check">
+                        <input class="form-check-input genre-filter" type="checkbox" name="genre[]" 
+                          id="genre_<?php echo htmlspecialchars($genre); ?>" 
+                          value="<?php echo htmlspecialchars($genre); ?>"
+                          <?php echo (isset($_GET['genre']) && in_array($genre, $_GET['genre'])) ? 'checked' : ''; ?>>
+                        <label class="form-check-label w-100" for="genre_<?php echo htmlspecialchars($genre); ?>">
+                          <?php echo htmlspecialchars($genre); ?>
+                        </label>
+                      </div>
+                    </li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+            </div>
+
+            <div class="status-wrapper">
+              <?php
+                // Get unique status values
+                $status_sql = "SELECT DISTINCT status 
+                             FROM animes a
+                             JOIN sites s ON a.site_id = s.id
+                             WHERE s.name = :site_name AND status IS NOT NULL
+                             ORDER BY status";
+                
+                $status_stmt = $pdo->prepare($status_sql);
+                $status_stmt->bindParam(':site_name', $site_name, PDO::PARAM_STR);
+                $status_stmt->execute();
+                $statuses = $status_stmt->fetchAll(PDO::FETCH_COLUMN);
+              ?>
+              <div class="dropdown w-100 mt-3">
+                <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Select Status
+                </button>
+                <ul class="dropdown-menu w-100">
+                  <?php foreach ($statuses as $status): ?>
+                    <li class="dropdown-item">
+                      <div class="form-check">
+                        <input class="form-check-input status-filter" type="checkbox" name="status[]" 
+                          id="status_<?php echo htmlspecialchars($status); ?>" 
+                          value="<?php echo htmlspecialchars($status); ?>"
+                          <?php echo (isset($_GET['status']) && in_array($status, $_GET['status'])) ? 'checked' : ''; ?>>
+                        <label class="form-check-label w-100" for="status_<?php echo htmlspecialchars($status); ?>">
+                          <?php echo htmlspecialchars($status); ?>
+                        </label>
+                      </div>
+                    </li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -65,72 +103,83 @@
             $offset = ($current_page - 1) * $items_per_page;
 
             try {
-                $where_conditions = ["sites.name = :site_name"];
-                $params = [':site_name' => $site_name];
-        
-                // Add genre filters if selected
-                if (isset($_GET['genre']) && !empty($_GET['genre'])) {
-                    $genre_placeholders = [];
-                    foreach ($_GET['genre'] as $key => $genre) {
-                        $placeholder = ":genre$key";
-                        $genre_placeholders[] = $placeholder;
-                        $params[$placeholder] = $genre;
-                    }
-                    $where_conditions[] = "EXISTS (
-                        SELECT 1 FROM anime_genres ag 
-                        WHERE ag.anime_id = animes.id 
-                        AND ag.genre IN (" . implode(',', $genre_placeholders) . ")
-                    )";
+              $where_conditions = ["sites.name = :site_name"];
+              $params = [':site_name' => $site_name];
+      
+              // Add genre filters if selected
+              if (isset($_GET['genre']) && !empty($_GET['genre'])) {
+                $genre_placeholders = [];
+                foreach ($_GET['genre'] as $key => $genre) {
+                  $placeholder = ":genre$key";
+                  $genre_placeholders[] = $placeholder;
+                  $params[$placeholder] = $genre;
                 }
-        
-                $where_clause = implode(' AND ', $where_conditions);
-        
-                // Modify count query
-                $count_sql = "SELECT COUNT(DISTINCT animes.id) as total 
-                              FROM animes 
-                              JOIN sites ON animes.site_id = sites.id 
-                              WHERE $where_clause";
-                
-                $count_stmt = $pdo->prepare($count_sql);
-                foreach ($params as $key => $value) {
-                    $count_stmt->bindValue($key, $value);
+                $where_conditions[] = "EXISTS (
+                  SELECT 1 FROM anime_genres ag 
+                  WHERE ag.anime_id = animes.id 
+                  AND ag.genre IN (" . implode(',', $genre_placeholders) . ")
+                )";
+              }
+
+              // Add status filters if selected
+              if (isset($_GET['status']) && !empty($_GET['status'])) {
+                $status_placeholders = [];
+                foreach ($_GET['status'] as $key => $status) {
+                  $placeholder = ":status$key";
+                  $status_placeholders[] = $placeholder;
+                  $params[$placeholder] = $status;
                 }
-                $count_stmt->execute();
-                $total_rows = $count_stmt->fetch(PDO::FETCH_ASSOC)['total'];
-                $total_pages = ceil($total_rows / $items_per_page);
-        
-                // Modify main query
-                $sql = "SELECT DISTINCT animes.*, sites.name AS site_name, sites.url AS site_url
-                        FROM animes
-                        JOIN sites ON animes.site_id = sites.id
-                        WHERE $where_clause
-                        LIMIT :limit OFFSET :offset";
-                
-                $stmt = $pdo->prepare($sql);
-                foreach ($params as $key => $value) {
-                    $stmt->bindValue($key, $value);
+                $where_conditions[] = "animes.status IN (" . implode(',', $status_placeholders) . ")";
+              }
+      
+              $where_clause = implode(' AND ', $where_conditions);
+      
+              // Modify count query
+              $count_sql = "SELECT COUNT(DISTINCT animes.id) as total 
+                            FROM animes 
+                            JOIN sites ON animes.site_id = sites.id 
+                            WHERE $where_clause";
+              
+              $count_stmt = $pdo->prepare($count_sql);
+              foreach ($params as $key => $value) {
+                $count_stmt->bindValue($key, $value);
+              }
+              $count_stmt->execute();
+              $total_rows = $count_stmt->fetch(PDO::FETCH_ASSOC)['total'];
+              $total_pages = ceil($total_rows / $items_per_page);
+      
+              // Modify main query
+              $sql = "SELECT DISTINCT animes.*, sites.name AS site_name, sites.url AS site_url
+                      FROM animes
+                      JOIN sites ON animes.site_id = sites.id
+                      WHERE $where_clause
+                      LIMIT :limit OFFSET :offset";
+              
+              $stmt = $pdo->prepare($sql);
+              foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+              }
+              $stmt->bindValue(':limit', $items_per_page, PDO::PARAM_INT);
+              $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+              $stmt->execute();
+              
+              $animes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+              
+              if ($animes) {
+                foreach ($animes as $anime) {
+                  echo '<div class="anime-wrapper col-6 col-md-3 col-lg-4 col-xl-3">';
+                  echo '<div class="anime" id="' . $anime['id']  . '">';  
+                  echo '<div class="image"><img src="' . $anime['image_url'] . '" width="100"></div>';
+                  echo '<div class="status"><span class="type">' . $anime['type'] . '</span>';
+                  echo '<span class="type">' . $anime['status'] . '</span></div>';
+                  echo '<div class="text">';
+                  echo '<h2 class="h6">' . $anime['title'] . '</h2></div>';
+                  echo '<button type="button" class="btn btn-link viewChapters">Charapters</button>';
+                  echo "</div></div>";
                 }
-                $stmt->bindValue(':limit', $items_per_page, PDO::PARAM_INT);
-                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-                $stmt->execute();
-                
-                $animes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                
-                if ($animes) {
-                  foreach ($animes as $anime) {
-                    echo '<div class="anime-wrapper col-6 col-md-3 col-lg-4 col-xl-3">';
-                    echo '<div class="anime" id="' . $anime['id']  . '">';  
-                    echo '<div class="image"><img src="' . $anime['image_url'] . '" width="100"></div>';
-                    echo '<div class="status"><span class="type">' . $anime['type'] . '</span>';
-                    echo '<span class="type">' . $anime['status'] . '</span></div>';
-                    echo '<div class="text">';
-                    echo '<h2 class="h6">' . $anime['title'] . '</h2></div>';
-                    echo '<button type="button" class="btn btn-link viewChapters">Charapters</button>';
-                    echo "</div></div>";
-                  }
-                } else {
-                  echo "No animes found for the site '$site_name'.";
-                }
+              } else {
+                echo "No animes found for the site '$site_name'.";
+              }
             } catch (PDOException $e) {
               echo "Error in query: " . $e->getMessage();
             }

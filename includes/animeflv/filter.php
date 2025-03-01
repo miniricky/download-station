@@ -31,6 +31,16 @@ try {
     )";
   }
 
+  if (isset($_GET['status']) && !empty($_GET['status'])) {
+    $status_placeholders = [];
+    foreach ($_GET['status'] as $key => $status) {
+      $placeholder = ":status$key";
+      $status_placeholders[] = $placeholder;
+      $params[$placeholder] = $status;
+    }
+    $where_conditions[] = "animes.status IN (" . implode(',', $status_placeholders) . ")";
+  }
+
   $where_clause = implode(' AND ', $where_conditions);
 
   // Count query
@@ -100,19 +110,17 @@ try {
     $pagination .= '<li class="page-item deactivate"><a class="page-link" href="#">Next</a></li>';
   }
   $pagination .= '</ul>';
-
-  // ... código existente hasta antes del json_encode ...
   
-  // Obtener géneros disponibles
+  // Get available genres
   $genres_sql = "SELECT DISTINCT ag.genre 
                  FROM anime_genres ag
                  JOIN animes a ON ag.anime_id = a.id
                  JOIN sites s ON a.site_id = s.id
                  WHERE s.name = :site_name";
 
-  // Si hay búsqueda, filtrar géneros por los animes que coinciden
+  // If there is a search, filter genres by the animes that match
   if (isset($_GET['search']) && !empty($_GET['search'])) {
-      $genres_sql .= " AND a.title LIKE :search_term";
+    $genres_sql .= " AND a.title LIKE :search_term";
   }
 
   $genres_sql .= " ORDER BY ag.genre";
@@ -120,16 +128,16 @@ try {
   $genres_stmt = $pdo->prepare($genres_sql);
   $genres_stmt->bindValue(':site_name', $site_name);
   if (isset($_GET['search']) && !empty($_GET['search'])) {
-      $genres_stmt->bindValue(':search_term', '%' . $_GET['search'] . '%');
+    $genres_stmt->bindValue(':search_term', '%' . $_GET['search'] . '%');
   }
   $genres_stmt->execute();
   $available_genres = $genres_stmt->fetchAll(PDO::FETCH_COLUMN);
 
   echo json_encode([
-      'content' => $content,
-      'pagination' => $pagination,
-      'total' => $total_rows,
-      'available_genres' => $available_genres
+    'content' => $content,
+    'pagination' => $pagination,
+    'total' => $total_rows,
+    'available_genres' => $available_genres
   ]);
 
 } catch (PDOException $e) {

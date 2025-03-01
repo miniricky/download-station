@@ -6,20 +6,30 @@
 
       function updateContent(page = 1, isSearch = false) {
         const searchInput = container.querySelector('#animeSearch');
-        const checkboxes = container.querySelectorAll('.genre-filter');
+        const genreCheckboxes = container.querySelectorAll('.genre-filter');
+        const statusCheckboxes = container.querySelectorAll('.status-filter');
         const searchTerm = searchInput.value.trim();
         const searchParams = new URLSearchParams();
         
         if (isSearch) {
-          checkboxes.forEach(checkbox => checkbox.checked = false);
+          // Reset all filters
+          genreCheckboxes.forEach(checkbox => checkbox.checked = false);
+          statusCheckboxes.forEach(checkbox => checkbox.checked = false);
           if (searchTerm) {
             searchParams.append('search', searchTerm);
           }
         } else {
           searchInput.value = '';
-          checkboxes.forEach(checkbox => {
+          // Add genre filters
+          genreCheckboxes.forEach(checkbox => {
             if (checkbox.checked) {
               searchParams.append('genre[]', checkbox.value);
+            }
+          });
+          // Add status filters
+          statusCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+              searchParams.append('status[]', checkbox.value);
             }
           });
         }
@@ -41,7 +51,13 @@
       }
 
       function attachFilterListeners() {
+        // Genre filters
         container.querySelectorAll('.genre-filter').forEach(checkbox => {
+          checkbox.addEventListener('change', () => updateContent(1, false));
+        });
+        
+        // Status filters
+        container.querySelectorAll('.status-filter').forEach(checkbox => {
           checkbox.addEventListener('change', () => updateContent(1, false));
         });
       }

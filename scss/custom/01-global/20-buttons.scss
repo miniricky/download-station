@@ -62,7 +62,7 @@ a{
   &.underline-link {
     position: relative;
     text-decoration: none;
-    color: $white;
+    color: $red;
     transition: color 0.3s ease-in-out;
   
     &::before {
@@ -79,11 +79,11 @@ a{
     }
   
     &:active {
-      color: $white !important;
+      color: $red !important;
     }
   
     &:hover {
-      color: $white;
+      color: $red;
   
       &::before {
         transform: scaleX(1);
@@ -91,7 +91,7 @@ a{
     }
   
     &:focus {
-      color: $white;
+      color: $red;
   
       &::before {
         transform: scaleX(1);

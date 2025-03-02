@@ -143,7 +143,7 @@ function saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $status) {
 
       $extraData = getAnimeDetails($link);
       $synopsis = $extraData['data']['synopsis'];
-      $chapters = $extraData['data']['episodes'];
+      $episodes = $extraData['data']['episodes'];
       $genres = $extraData['data']['genres'];
 
       $sql = "INSERT INTO animes (site_id, title, type, link, image_url, synopsis, status) VALUES (:site_id, :title, :type, :link, :image_url, :synopsis, :status)";
@@ -159,14 +159,14 @@ function saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $status) {
       ]);
       $anime_id = $pdo->lastInsertId();
 
-      foreach ($chapters as $key => $chapter) {
-        $streamtapeLink = scrapingEpisode($chapter['link']);
+      foreach ($episodes as $key => $episode) {
+        $streamtapeLink = scrapingEpisode($episode['link']);
       
-        $sql = "INSERT INTO anime_chapters (anime_id, chapter_number, link) VALUES (:anime_id, :chapter_number, :link)";
+        $sql = "INSERT INTO anime_episodes (anime_id, episode_number, link) VALUES (:anime_id, :episode_number, :link)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
           "anime_id" => $anime_id,
-          "chapter_number" => $key + 1,
+          "episode_number" => $key + 1,
           "link" => $streamtapeLink
         ]);
       }

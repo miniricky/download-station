@@ -37,13 +37,13 @@ function getAnimeDetails($pdo, $anime_id) {
     return null;
   }
 
-  $sqlChapters = "SELECT chapter_number, link FROM anime_chapters WHERE anime_id = :anime_id ORDER BY chapter_number ASC";
-  $stmt = $pdo->prepare($sqlChapters);
+  $sqlEpisodes = "SELECT episode_number, link FROM anime_episodes WHERE anime_id = :anime_id ORDER BY episode_number ASC";
+  $stmt = $pdo->prepare($sqlEpisodes);
   $stmt->bindParam(':anime_id', $anime_id, PDO::PARAM_INT);
   $stmt->execute();
-  $chapters = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $episodes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-  $anime['chapters'] = $chapters;
+  $anime['episodes'] = $episodes;
 
   return $anime;
 }

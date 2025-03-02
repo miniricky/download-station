@@ -176,7 +176,7 @@
                   echo '<span class="type">' . $anime['status'] . '</span></div>';
                   echo '<div class="text">';
                   echo '<h2 class="h6">' . $anime['title'] . '</h2></div>';
-                  echo '<button type="button" class="btn btn-link episodes viewChapters">Episodes</button>';
+                  echo '<button type="button" class="btn btn-link episodes viewEpisodes">Episodes</button>';
                   echo "</div></div>";
                 }
               } else {

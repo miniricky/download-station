@@ -84,7 +84,7 @@ try {
       $content .= '<div class="status"><span class="type">' . $anime['type'] . '</span>';
       $content .= '<span class="type">' . $anime['status'] . '</span></div>';
       $content .= '<div class="text"><h2 class="h6">' . $anime['title'] . '</h2></div>';
-      $content .= '<button type="button" class="btn btn-link viewChapters">Charapters</button>';
+      $content .= '<button type="button" class="btn btn-link viewEpisodes">Episodes</button>';
       $content .= "</div></div>";
     }
   } else {

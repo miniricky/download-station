@@ -63,7 +63,7 @@
       }
 
       function reattachEventListeners(isSearch) {
-        container.querySelectorAll('.viewChapters').forEach(button => {
+        container.querySelectorAll('.viewEpisodes').forEach(button => {
           button.addEventListener('click', function() {
             const animeId = this.closest('.anime').getAttribute('id');
             const existingDetail = document.querySelector('.anime-detail');

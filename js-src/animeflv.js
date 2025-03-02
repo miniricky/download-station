@@ -5,7 +5,7 @@
     if (window.location.pathname.includes('animeflv.php')) {
       const container = document.querySelector('#animeflv');
 
-      container.querySelectorAll('.viewChapters').forEach(button => {
+      container.querySelectorAll('.viewEpisodes').forEach(button => {
         button.addEventListener('click', function() {
           const animeId = this.closest('.anime').getAttribute('id');
           const existingDetail = document.querySelector('.anime-detail');
@@ -76,7 +76,7 @@
                 <div class="tab-content" id="animeflvTabContent">
                   <div class="tab-pane fade show active" id="desktop-tab-pane" role="tabpanel" aria-labelledby="desktop-tab" tabindex="0">
                     <ul class="list-group list-group-flush">
-                      ${data.chapters.map(ch => `<li class="list-group-item"><a class="download-desktop" href="${ch.link}" target="_blank">Episode ${ch.chapter_number}</a></li>`).join('')}
+                      ${data.episodes.map(ch => `<li class="list-group-item"><a class="download-desktop" href="${ch.link}" target="_blank">Episode ${ch.episode_number}</a></li>`).join('')}
                     </ul>
                   </div>
                   <div class="tab-pane fade" id="synology-tab-pane" role="tabpanel" aria-labelledby="synology-tab" tabindex="0">
@@ -122,7 +122,7 @@
                   url += '&episodes[]=' + encodeURIComponent(element.querySelector('a').textContent);
                 });
 
-                validateEpisodes(url, data.chapters, container);
+                validateEpisodes(url, data.episodes, container);
               }
             });
           }
@@ -169,7 +169,7 @@
       /*
           * Function for validated if episodes exist.
           */
-      function validateEpisodes(url, charapters, container) {
+      function validateEpisodes(url, episodes, container) {
         fetch(`../includes/synology.php?info=verify-episodes${url}`)
         .then(response => response.json())
         .then(data => {
@@ -179,24 +179,24 @@
           }
 
           var status = false;
-          var episodes = [];
+          var episodesArray = [];
 
-          charapters.forEach(charapter => { 
-            var filteredCharapter = data.verify.filter(ep => ep.episode === 'Episode ' + charapter.chapter_number);
+          episodes.forEach(episode => { 
+            var filteredEpisodes = data.verify.filter(ep => ep.episode === 'Episode ' + episode.episode_number);
 
-            if (filteredCharapter.length !== 0) {
-              status = filteredCharapter[0].status;
+            if (filteredEpisodes.length !== 0) {
+              status = filteredEpisodes[0].status;
 
-              episodes.push({
-                episode: charapter.chapter_number,
-                link: charapter.link,
+              episodesArray.push({
+                episode: episode.episode_number,
+                link: episode.link,
                 status: status
               });
             }
             else {
-              episodes.push({
-                episode: charapter.chapter_number,
-                link: charapter.link,
+              episodesArray.push({
+                episode: episode.episode_number,
+                link: episode.link,
                 status: 'false'
               });
             }
@@ -206,7 +206,7 @@
           const list = document.createElement('ul');
           list.classList.add('list-group', 'list-group-flush');
 
-          episodes.forEach(episode => {
+          episodesArray.forEach(episode => {
             const listItem = document.createElement('li');
             listItem.classList.add('list-group-item', 'item-'+ episode.episode);
 

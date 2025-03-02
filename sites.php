@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
-  <title>Static Template</title>
+  <title>Download Station</title>
 
   <!-- CSS styles -->
   <link href="./css/style.min.css" rel="stylesheet">

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
-  <title>Static Template</title>
+  <title>Download Station</title>
 
   <!-- CSS styles -->
   <link href="./css/style.min.css" rel="stylesheet">
@@ -293,6 +293,14 @@
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="loader-overlay visually-hidden">
+    <div class="loader-content">
+      <div class="spinner-border text-primary mb-2" role="status">
+        <span class="visually-hidden">Loading.. .</span>
+      </div>
+      <div>Processing download request</div>
     </div>
   </div>
   <footer class="footer mt-auto py-3 text-center bg-purple-dark">

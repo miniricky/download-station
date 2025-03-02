@@ -280,6 +280,9 @@
        * Function for scraping download link.
        */
       function scrapingStreamtape(scrapeUrl, title, episode, item, type) {
+        const overlay = document.querySelector('.loader-overlay');
+        overlay.classList.remove('visually-hidden');
+
         const url = 'http://localhost:3000/scrape/streamtape';
         fetch(url, {
           method: 'POST',
@@ -293,19 +296,18 @@
               console.log(errorMessage);
               return Promise.reject('Page is unreachable');
             }
-
             return Promise.reject(new Error('Bad Request'));
           }
-
           return response.json();
         })
         .then(result => {
           if (result && result.data && result.data.status === true) {
             if (type === 'desktop') {
               const url = `/includes/download-file.php?url=${encodeURIComponent("https:" + result.data.src)}&filename=${encodeURIComponent(title + " - "  + episode + ".mp4")}`;
+              overlay.classList.add('visually-hidden');
               window.open(url, '_blank');
             } else {
-              sendURL("https:" + result.data.src, title, episode, result.data.title, item);
+              sendURL("https:" + result.data.src, title, episode, result.data.title, item, overlay, type);
             }
           } else {
             console.log('Download link not found.');
@@ -315,13 +317,13 @@
           if (error !== 'Page is unreachable' && error.message !== 'Bad Request') {
             console.log('Error in scrapingStreamtape:', error);
           }
-        });
+        })
       }
 
       /*
        * Function for send the download url.
        */
-      function sendURL(url, title, episode, name, item) {
+      function sendURL(url, title, episode, name, item, overlay, type) {
         const params = `info=download-station&url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&episode=${encodeURIComponent(episode)}`;
         fetchRequest('../includes/synology.php', params, (err, responseData) => {
           if (err) {
@@ -333,14 +335,14 @@
             return;
           }
 
-          idDownload(name, episode, title, item);
+          idDownload(name, episode, title, item, overlay, type);
         });
       }
 
       /*
        * Function for get the download information.
        */
-      function idDownload(name, episode, title, item) {
+      function idDownload(name, episode, title, item, overlay, type) {
         const intervalDownload = setInterval(() => {
           const params = `info=id-download&name=${encodeURIComponent(name)}`;
           fetchRequest('../includes/synology.php', params, (err, responseData) => {
@@ -352,7 +354,7 @@
             if (responseData.id.download == 'downloading') {
               const id = responseData.id.id;
               clearInterval(intervalDownload);
-              infoDownload(id, episode, title, name, item);
+              infoDownload(id, episode, title, name, item, overlay, type);
             }
           });
         }, 1000);
@@ -361,7 +363,7 @@
       /*
       * Function for start to download.
       */
-      function infoDownload(id, episode, title, name, item,) {
+      function infoDownload(id, episode, title, name, item, overlay, type) {
         const intervalInfo = setInterval(() => {
           const params = `info=info-download&id=${encodeURIComponent(id)}`;
           fetchRequest('../includes/synology.php', params, (err, responseData) => {
@@ -382,6 +384,10 @@
               if (responseData.info.size > 0) {
                 const progressDiv = document.querySelector(`.progress.${id}`);
                 if (!progressDiv) {
+                  if (type === 'synology') {
+                    overlay.classList.add('visually-hidden');
+                  }
+
                   createProgressBar(id, progress, item);
                 } else {
                   const progressBar = document.querySelector(`.progress.${id} .progress-bar`);

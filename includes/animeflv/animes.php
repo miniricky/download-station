@@ -23,10 +23,6 @@ switch ($status) {
     $url = 'https://www3.animeflv.net/browse?status%5B%5D=2&order=default';
     $status = 'Finished';
     break;
-  case 'comingSoon':
-    $url = 'https://www3.animeflv.net/browse?status%5B%5D=3&order=default';
-    $status = 'Coming Soon';
-    break;
 }
 
 /* 

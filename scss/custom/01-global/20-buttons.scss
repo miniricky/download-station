@@ -11,7 +11,7 @@ button.btn-link {
     top: 50%;
     right: 0;
     display: block;
-    @include mask-image(url("../images/fontawesome/circle-arrow-right-solid.svg"));
+    @include mask-image(url("../images/fontawesome/arrow-right-solid.svg"));
     @include mask-repeat(no-repeat);
     @include mask-size(15px 15px);
     width: 15px;
@@ -19,6 +19,12 @@ button.btn-link {
     background: $white;
     @include transform(translateY(-50%) translateX(0));
     transition: transform 0.3s ease-in-out;
+  }
+
+  &.status{
+    &:after {
+      @include mask-image(url("../images/fontawesome/download-solid.svg"));
+    }
   }
 
   &::before {

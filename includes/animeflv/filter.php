@@ -105,24 +105,48 @@ try {
 
   // Generate pagination HTML
   $pagination = '<ul class="pagination">';
+  
+  // Prev button
   if ($current_page > 1) {
     $pagination .= '<li class="page-item"><a class="page-link" href="#" data-page="' . ($current_page - 1) . '">Prev</a></li>';
   } else {
     $pagination .= '<li class="page-item deactivate"><a class="page-link" href="#">Prev</a></li>';
   }
-  
-  for ($i = 1; $i <= $total_pages; $i++) {
+
+  $total_visible = 5; // Número de páginas visibles en el medio
+  $start = max(1, min($current_page - floor($total_visible/2), $total_pages - $total_visible + 1));
+  $end = min($start + $total_visible - 1, $total_pages);
+
+  // First page
+  if ($start > 1) {
+    $pagination .= '<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>';
+    if ($start > 2) {
+      $pagination .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+    }
+  }
+
+  // Middle pages
+  for ($i = $start; $i <= $end; $i++) {
     $active = $i == $current_page ? 'active' : '';
     $pagination .= '<li class="page-item ' . $active . '"><a class="page-link" href="#" data-page="' . $i . '">' . $i . '</a></li>';
   }
-  
+
+  // Last page
+  if ($end < $total_pages) {
+    if ($end < $total_pages - 1) {
+      $pagination .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+    }
+    $pagination .= '<li class="page-item"><a class="page-link" href="#" data-page="' . $total_pages . '">' . $total_pages . '</a></li>';
+  }
+
+  // Next button
   if ($current_page < $total_pages) {
     $pagination .= '<li class="page-item"><a class="page-link" href="#" data-page="' . ($current_page + 1) . '">Next</a></li>';
   } else {
     $pagination .= '<li class="page-item deactivate"><a class="page-link" href="#">Next</a></li>';
   }
   $pagination .= '</ul>';
-  
+
   // Get available genres
   $genres_sql = "SELECT DISTINCT ag.genre 
                  FROM anime_genres ag
@@ -130,7 +154,6 @@ try {
                  JOIN sites s ON a.site_id = s.id
                  WHERE s.name = :site_name";
 
-  // If there is a search, filter genres by the animes that match
   if (isset($_GET['search']) && !empty($_GET['search'])) {
     $genres_sql .= " AND a.title LIKE :search_term";
   }
@@ -145,11 +168,34 @@ try {
   $genres_stmt->execute();
   $available_genres = $genres_stmt->fetchAll(PDO::FETCH_COLUMN);
 
+  // Get available types (existing code)
+  $types_sql = "SELECT DISTINCT type 
+                FROM animes a
+                JOIN sites s ON a.site_id = s.id
+                WHERE s.name = :site_name 
+                AND type IS NOT NULL";
+
+  if (isset($_GET['search']) && !empty($_GET['search'])) {
+    $types_sql .= " AND a.title LIKE :search_term";
+  }
+
+  $types_sql .= " ORDER BY type";
+
+  $types_stmt = $pdo->prepare($types_sql);
+  $types_stmt->bindValue(':site_name', $site_name);
+  if (isset($_GET['search']) && !empty($_GET['search'])) {
+    $types_stmt->bindValue(':search_term', '%' . $_GET['search'] . '%');
+  }
+  $types_stmt->execute();
+  $available_types = $types_stmt->fetchAll(PDO::FETCH_COLUMN);
+
+  // Single JSON response with all data
   echo json_encode([
     'content' => $content,
     'pagination' => $pagination,
     'total' => $total_rows,
-    'available_genres' => $available_genres
+    'available_genres' => $available_genres,
+    'available_types' => $available_types
   ]);
 
 } catch (PDOException $e) {

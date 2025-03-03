@@ -1,0 +1,23 @@
+#sidModal{
+  .modal-header{
+    button{
+      filter: brightness(0) invert(1);
+    }
+  }
+
+  .modal-body{
+    #sid{
+      #sid-form{
+        input{
+          + label{
+            margin-top: 10px;
+          }
+        }
+    
+        span{
+          padding: 10px 0;
+        }
+      }
+    }
+  }
+}

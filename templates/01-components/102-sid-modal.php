@@ -1,6 +1,6 @@
 <div class="modal fade" id="sidModal" tabindex="-1" aria-labelledby="sidModallLabel" aria-hidden="true">
   <div class="modal-dialog modal-fullscreen">
-    <div class="modal-content bg-dark text-white">
+    <div class="modal-content bg-purple text-white">
       <div class="modal-header">
         <h1 class="modal-title fs-5">Synology Credentials</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -24,7 +24,7 @@
                 Your credentials are only saved in cookies, not in the database.
               </span>
 
-              <button class="btn btn-primary w-100 py-2" id="" type="submit">Add credentials</button>
+              <button class="btn btn-secondary w-100 py-2" id="" type="submit">Add credentials</button>
             </form>
           </div>
         </div>

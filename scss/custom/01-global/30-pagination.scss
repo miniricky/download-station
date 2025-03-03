@@ -5,7 +5,8 @@ ul.pagination{
   margin-bottom: 0;
 
   li.page-item{
-    a.page-link{
+    a.page-link,
+    span.page-link{
       width: 30px;
       height: 30px;
       padding: 0;
@@ -15,57 +16,43 @@ ul.pagination{
       align-items: center;
     }
 
-    &:first-child{
-      a.page-link{
-        position: relative;
-        text-indent: -9999999999px;
-
-        &:after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          display: block;
-          @include mask-image(url("../images/fontawesome/angle-left-solid.svg"));
-          @include mask-repeat(no-repeat);
-          @include mask-size(15px 15px);
-          width: 15px;
-          height: 15px;
-          background: $white;
-          @include transform(translate(-50%, -50%));
-        }
-      }
-    }
-
-    &:last-child{
-      a.page-link{
-        position: relative;
-        text-indent: -9999999999px;
-
-        &:after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          display: block;
-          @include mask-image(url("../images/fontawesome/angle-right-solid.svg"));
-          @include mask-repeat(no-repeat);
-          @include mask-size(15px 15px);
-          width: 15px;
-          height: 15px;
-          background: $white;
-          @include transform(translate(-50%, -50%));
-        }
-      }
-    }
-
     &:first-child,
     &:last-child{
-      .page-link{
-        &:hover,
-        &:focus{
-          color: $white;
-          background-color: transparent;
+      a.page-link{
+        position: relative;
+        text-indent: -9999999999px;
+        width: 15px;
+        color: $white;
+        background-color: transparent;
+
+        &:after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          display: block;
+          @include mask-repeat(no-repeat);
+          @include mask-size(15px 15px);
+          width: 15px;
+          height: 15px;
+          background: $white;
+          @include transform(translate(-50%, -50%));
+        }
+      }
+    }
+
+    &:first-child{
+      a.page-link{
+        &:after{
+          @include mask-image(url("../images/fontawesome/angle-left-solid.svg"));
+        }
+      }
+    }
+
+    &:last-child{
+      a.page-link{
+        &:after {
+          @include mask-image(url("../images/fontawesome/angle-right-solid.svg"));
         }
       }
     }
@@ -74,6 +61,14 @@ ul.pagination{
       a.page-link{
         cursor: default;
         opacity: .5;
+      }
+    }
+
+    &.disabled{
+      span.page-link{
+        width: 15px;
+        background-color: transparent;
+        color: $white;
       }
     }
   }

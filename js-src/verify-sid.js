@@ -17,7 +17,7 @@
       if (!sid) {
         loginForm = `
         <p>You need to add your synology credentials</p>
-        <button type="button" class="btn btn-primary" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sidModal">Open Synology form</button>
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#sidModal">Open Synology form</button>
         `;
       }
 

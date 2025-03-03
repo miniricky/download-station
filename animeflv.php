@@ -50,6 +50,9 @@
             <div class="search-container">
               <label for="animeSearch" class="form-label h4">Search</label>
               <input class="form-control" type="search" id="animeSearch" placeholder="Type to search..." autocomplete="off">
+              <div id="animeSearchHelpBlock" class="form-text text-white">
+                The search and filters are independently.
+              </div>
             </div>
 
             <div class="filters-container">
@@ -268,20 +271,44 @@
         <div class="pagination-row">
           <nav arial-label="Page navigation">
             <ul class="pagination">
+              <!-- Flecha izquierda -->
               <li class="page-item <?php echo ($current_page == 1) ? 'deactivate' : ''; ?>">
                 <a class="page-link" href="<?php echo ($current_page > 1) ? $base_url . 'page=' . ($current_page - 1) : '#'; ?>">
                   Prev
                 </a>
               </li>
 
-              <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-              <li class="page-item <?php echo ($i == $current_page) ? 'active' : ''; ?>">
-                <a class="page-link" href="<?php echo $base_url . 'page=' . $i; ?>">
-                  <?php echo $i; ?>
-                </a>
-              </li>
-              <?php endfor; ?>
+              <?php
+              $total_visible = 5; // Número de páginas visibles en el medio
+              $start = max(1, min($current_page - floor($total_visible/2), $total_pages - $total_visible + 1));
+              $end = min($start + $total_visible - 1, $total_pages);
+              
+              // Primera página
+              if ($start > 1) {
+                echo '<li class="page-item ' . (1 == $current_page ? 'active' : '') . '">';
+                echo '<a class="page-link" href="' . $base_url . 'page=1">1</a></li>';
+                if ($start > 2) {
+                  echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                }
+              }
 
+              // Páginas del medio
+              for ($i = $start; $i <= $end; $i++) {
+                echo '<li class="page-item ' . ($i == $current_page ? 'active' : '') . '">';
+                echo '<a class="page-link" href="' . $base_url . 'page=' . $i . '">' . $i . '</a></li>';
+              }
+
+              // Última página
+              if ($end < $total_pages) {
+                if ($end < $total_pages - 1) {
+                  echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                }
+                echo '<li class="page-item ' . ($total_pages == $current_page ? 'active' : '') . '">';
+                echo '<a class="page-link" href="' . $base_url . 'page=' . $total_pages . '">' . $total_pages . '</a></li>';
+              }
+            ?>
+
+              <!-- Flecha derecha -->
               <li class="page-item <?php echo ($current_page == $total_pages) ? 'deactivate' : ''; ?>">
                 <a class="page-link" href="<?php echo ($current_page < $total_pages) ? $base_url . 'page=' . ($current_page + 1) : '#'; ?>">
                   Next
@@ -295,7 +322,7 @@
   </div>
   <div class="modal fade" id="sidModal" tabindex="-1" aria-labelledby="sidModallLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
-      <div class="modal-content bg-dark text-white">
+      <div class="modal-content bg-purple text-white">
         <div class="modal-header">
           <h1 class="modal-title fs-5">Synology Credentials</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -319,7 +346,7 @@
                   Your credentials are only saved in cookies, not in the database.
                 </span>
 
-                <button class="btn btn-primary w-100 py-2" id="" type="submit">Add credentials</button>
+                <button class="btn btn-secondary w-100 py-2" id="" type="submit">Add credentials</button>
               </form>
             </div>
           </div>

@@ -138,6 +138,8 @@ function saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $status) {
     $exist = $stmt->fetchColumn();
 
     if ($exist == 0) {
+      $pdo->beginTransaction();
+
       $imagePath = __DIR__ . '/images/';
       $imageSaved = downloadImage($urlImage, $imagePath, $title);
 
@@ -179,8 +181,14 @@ function saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $status) {
           "genre" => $genre
         ]);
       }
+
+      $pdo->commit();
     }
   } catch (PDOException $e) {
+    if ($pdo->inTransaction()) {
+      $pdo->rollBack();
+    }
+
     echo "Error saving anime: " . $e->getMessage();
   }
 }
@@ -248,34 +256,5 @@ function scrapingEpisode($url) {
   }
 
   return null;
-}
-
-/*
-  * Function for scraping download link.
-  */
-function scrapingStreamtape($streamtapeUrl) {
-  $nodeServer = "http://localhost:3000/scrape/streamtape";
-  $postData = json_encode(["url" => $streamtapeUrl]);
-
-  $ch = curl_init($nodeServer);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_POST, true);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-  curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-
-  $response = curl_exec($ch);
-  $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-  $error = curl_error($ch);
-  curl_close($ch);
-
-  if ($response === false) {
-    return ["error" => "cURL error: " . $error];
-  }
-
-  if ($httpCode !== 200) {
-    return ["error" => "HTTP error: " . $httpCode, "response" => $response];
-  }
-
-  return json_decode($response, true);
 }
 ?>

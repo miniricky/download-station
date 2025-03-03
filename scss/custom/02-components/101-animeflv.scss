@@ -107,15 +107,15 @@
           }
 
           .genres{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+
             span.genre{
               background-color: #495057!important;
               padding: 1px 8px;
               border-radius: 25px;
               font-size: 12px;
-
-              + *{
-                margin-left: 5px;
-              }
             }
 
             + *{

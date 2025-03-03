@@ -29,6 +29,12 @@
           margin-top: 10px;
         }
       }
+
+      .type-wrapper{
+        + *{
+          margin-top: 10px;
+        }
+      }
     }
   }
 }

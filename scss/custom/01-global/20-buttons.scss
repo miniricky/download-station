@@ -11,7 +11,7 @@ button.btn-link {
     top: 50%;
     right: 0;
     display: block;
-    @include mask-image(url("../images/fontawesome/arrow-right-solid.svg"));
+    @include mask-image(url("../images/fontawesome/arrow-down-solid.svg"));
     @include mask-repeat(no-repeat);
     @include mask-size(15px 15px);
     width: 15px;

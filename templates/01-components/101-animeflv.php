@@ -55,6 +55,44 @@
               </div>
             </div>
 
+            <!-- Add type filter -->
+            <div class="type-wrapper">
+              <?php
+                // Get unique type values
+                $type_sql = "SELECT DISTINCT type 
+                           FROM animes a
+                           JOIN sites s ON a.site_id = s.id
+                           WHERE s.name = :site_name 
+                           AND type IS NOT NULL
+                           ORDER BY type";
+                
+                $type_stmt = $pdo->prepare($type_sql);
+                $type_stmt->bindParam(':site_name', $site_name, PDO::PARAM_STR);
+                $type_stmt->execute();
+                $types = $type_stmt->fetchAll(PDO::FETCH_COLUMN);
+              ?>
+              <div class="dropdown w-100">
+                <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Select Type
+                </button>
+                <ul class="dropdown-menu w-100">
+                  <?php foreach ($types as $type): ?>
+                    <li class="dropdown-item">
+                      <div class="form-check">
+                        <input class="form-check-input type-filter" type="checkbox" name="type[]" 
+                          id="type_<?php echo htmlspecialchars($type); ?>" 
+                          value="<?php echo htmlspecialchars($type); ?>"
+                          <?php echo (isset($_GET['type']) && in_array($type, $_GET['type'])) ? 'checked' : ''; ?>>
+                        <label class="form-check-label w-100" for="type_<?php echo htmlspecialchars($type); ?>">
+                          <?php echo htmlspecialchars($type); ?>
+                        </label>
+                      </div>
+                    </li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+            </div>
+
             <div class="status-wrapper">
               <?php
                 // Get unique status values

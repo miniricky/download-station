@@ -25,16 +25,20 @@
           }
         } else {
           searchInput.value = '';
-          // Add genre filters
+          // Add filters
           genreCheckboxes.forEach(checkbox => {
             if (checkbox.checked) {
               searchParams.append('genre[]', checkbox.value);
             }
           });
-          // Add status filters
           statusCheckboxes.forEach(checkbox => {
             if (checkbox.checked) {
               searchParams.append('status[]', checkbox.value);
+            }
+          });
+          typeCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+              searchParams.append('type[]', checkbox.value);
             }
           });
         }

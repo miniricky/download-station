@@ -31,6 +31,18 @@ try {
     )";
   }
 
+  // Add type filters if selected
+  if (isset($_GET['type']) && !empty($_GET['type'])) {
+    $type_placeholders = [];
+    foreach ($_GET['type'] as $key => $type) {
+      $placeholder = ":type$key";
+      $type_placeholders[] = $placeholder;
+      $params[$placeholder] = $type;
+    }
+    $where_conditions[] = "animes.type IN (" . implode(',', $type_placeholders) . ")";
+  }
+
+  // Add status filters if selected
   if (isset($_GET['status']) && !empty($_GET['status'])) {
     $status_placeholders = [];
     foreach ($_GET['status'] as $key => $status) {

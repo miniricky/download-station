@@ -35,26 +35,31 @@
     
         function scrapeNextPage() {
           if (page > totalPages) {
-            updatedProgressBar(container, status, '100', page, totalPages);
+            const progressBar = container.querySelector(`.progress.${status}`);
+            if (progressBar) {
+              updatedProgressBar(container, status, '100', page, totalPages);
+            }
             return;
           }
   
           fetch(`../includes/animeflv/animes.php?page=${page}&status=${status}`)
           .then(response => response.json())
           .then(data => {
-            if (data.message === 'No more pages') {
-              updatedProgressBar(container, status, '100', page, totalPages);
-              return;
+            const progress = Math.round((page / totalPages) * 100);
+            const progressBar = container.querySelector(`.progress.${status}`);
+            
+            if (progressBar) {
+              updatedProgressBar(container, status, progress, page, totalPages);
             }
 
-            const progress = Math.round((page / totalPages) * 100);
-            updatedProgressBar(container, status, progress, page, totalPages);
-
-            if (data.nextPage) {
-              page = data.nextPage;
+            // Continue to next page even if current page has no content
+            if (page < totalPages) {
+              page++;
               scrapeNextPage();
             } else {
-              updatedProgressBar(container, status, '100', page, totalPages);
+              if (progressBar) {
+                updatedProgressBar(container, status, '100', totalPages, totalPages);
+              }
             }
           })
           .catch(error => console.error("Scraping error:", error));

@@ -271,7 +271,6 @@
         <div class="pagination-row">
           <nav arial-label="Page navigation">
             <ul class="pagination">
-              <!-- Flecha izquierda -->
               <li class="page-item <?php echo ($current_page == 1) ? 'deactivate' : ''; ?>">
                 <a class="page-link" href="<?php echo ($current_page > 1) ? $base_url . 'page=' . ($current_page - 1) : '#'; ?>">
                   Prev
@@ -279,11 +278,10 @@
               </li>
 
               <?php
-              $total_visible = 5; // Número de páginas visibles en el medio
+              $total_visible = 5;
               $start = max(1, min($current_page - floor($total_visible/2), $total_pages - $total_visible + 1));
               $end = min($start + $total_visible - 1, $total_pages);
               
-              // Primera página
               if ($start > 1) {
                 echo '<li class="page-item ' . (1 == $current_page ? 'active' : '') . '">';
                 echo '<a class="page-link" href="' . $base_url . 'page=1">1</a></li>';
@@ -292,13 +290,11 @@
                 }
               }
 
-              // Páginas del medio
               for ($i = $start; $i <= $end; $i++) {
                 echo '<li class="page-item ' . ($i == $current_page ? 'active' : '') . '">';
                 echo '<a class="page-link" href="' . $base_url . 'page=' . $i . '">' . $i . '</a></li>';
               }
 
-              // Última página
               if ($end < $total_pages) {
                 if ($end < $total_pages - 1) {
                   echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
@@ -308,7 +304,6 @@
               }
             ?>
 
-              <!-- Flecha derecha -->
               <li class="page-item <?php echo ($current_page == $total_pages) ? 'deactivate' : ''; ?>">
                 <a class="page-link" href="<?php echo ($current_page < $total_pages) ? $base_url . 'page=' . ($current_page + 1) : '#'; ?>">
                   Next

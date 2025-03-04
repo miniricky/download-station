@@ -1,7 +1,7 @@
 (function ($) {
   document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.includes('sites.php')) {
-      document.querySelectorAll(".status").forEach(button => {
+      document.querySelectorAll(".animeflv-status").forEach(button => {
         button.addEventListener("click", function() {
           getAnimeData(this.id);
         });

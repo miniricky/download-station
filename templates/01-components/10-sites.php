@@ -8,8 +8,8 @@
           </div>
 
           <div class="body d-flex flex-column">
-            <button type="button" id="onAir" class="btn btn-link status">On Air</button>
-            <button type="button" id="finished" class="btn btn-link status">Finished</button>
+            <button type="button" id="onAir" class="btn btn-link animeflv-status">On Air</button>
+            <button type="button" id="finished" class="btn btn-link animeflv-status">Finished</button>
           </div>
 
           <div class="progress-wrapper w-100 text-center"></div>

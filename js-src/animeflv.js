@@ -291,6 +291,24 @@
         })
         .then(response => {
           if (!response.ok) {
+            if (response.status === 404) {
+              overlay.classList.add('visually-hidden');
+              const toast = document.querySelector('.toast');
+              const toastBody = toast.querySelector('.toast-body');
+              toastBody.textContent = 'Sorry, the video is unreachable.';
+
+              // Configure toast options
+              const toastOptions = {
+                animation: true,
+                autohide: true,
+                delay: 3000
+              };
+
+              // Initialize and show toast
+              const bsToast = bootstrap.Toast.getOrCreateInstance(toast, toastOptions);
+              bsToast.show();
+            }
+            
             if (response.status === 400) {
               const errorMessage = 'page is unreachable.';
               console.log(errorMessage);

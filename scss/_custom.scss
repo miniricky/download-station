@@ -26,7 +26,7 @@
 @import 'custom/01-global/40-themes';
 @import 'custom/01-global/50-wysiwyg';
 @import 'custom/01-global/98-footer';
-@import 'custom/01-global/100-overlay';
+@import 'custom/01-global/97-overlay';
 
 /**
  * External Libraries.
@@ -35,9 +35,9 @@
 /**
  * 02-components.
  */
-@import 'custom/02-components/00-sid-modal';
-@import 'custom/02-components/100-scraping';
-@import 'custom/02-components/101-animeflv';
-@import 'custom/02-components/102-filters';
-@import 'custom/02-components/103-hero';
-@import 'custom/02-components/110-sidebar';
+@import 'custom/02-components/02-hero';
+@import 'custom/02-components/10-sites';
+@import 'custom/02-components/11-animeflv';
+@import 'custom/02-components/22-sidebar';
+@import 'custom/02-components/23-filters';
+@import 'custom/02-components/90-sid-modal';

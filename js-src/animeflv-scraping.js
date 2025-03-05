@@ -11,7 +11,7 @@
       * Function for get anime data.
       */
       function getAnimeData(status) {
-        const container = document.querySelector('#scraping');
+        const container = document.querySelector('#sites');
         const wrapper = container.querySelector('.progress-wrapper');
         let totalPages = 1;
         let page = 1;

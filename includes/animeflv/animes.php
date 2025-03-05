@@ -132,14 +132,13 @@ function getAnimes($pdo, $url, $site_id, $status) {
  */
 function saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $status) {
   try {
-    $sql = "SELECT COUNT(*) FROM animes WHERE link = :link";
+    $sql = "SELECT id FROM animes WHERE link = :link";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(["link" => $link]);
-    $exist = $stmt->fetchColumn();
+    $anime = $stmt->fetch(PDO::FETCH_ASSOC);
+    $pdo->beginTransaction();
 
-    if ($exist == 0) {
-      $pdo->beginTransaction();
-
+    if (!$anime) {
       $imagePath = __DIR__ . '/images/';
       $imageSaved = downloadImage($urlImage, $imagePath, $title);
 
@@ -160,19 +159,48 @@ function saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $status) {
         "status" => $status
       ]);
       $anime_id = $pdo->lastInsertId();
+    } else {
+      $anime_id = $anime['id'];
+      $extraData = getAnimeDetails($link);
+      $episodes = $extraData['data']['episodes'];
+    }
 
-      foreach ($episodes as $key => $episode) {
-        $streamtapeLink = scrapingEpisode($episode['link']);
+    // Processing episodes for new and existing anime
+    foreach ($episodes as $key => $episode) {
+      $episode_number = $key + 1;
+      $streamtapeLink = scrapingEpisode($episode['link']);
       
+      // Check if the episode exists
+      $sql = "SELECT id, link FROM anime_episodes WHERE anime_id = :anime_id AND episode_number = :episode_number";
+      $stmt = $pdo->prepare($sql);
+      $stmt->execute([
+        "anime_id" => $anime_id,
+        "episode_number" => $episode_number
+      ]);
+      $existingEpisode = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if (!$existingEpisode) {
+        // Insert new episode
         $sql = "INSERT INTO anime_episodes (anime_id, episode_number, link) VALUES (:anime_id, :episode_number, :link)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
           "anime_id" => $anime_id,
-          "episode_number" => $key + 1,
+          "episode_number" => $episode_number,
+          "link" => $streamtapeLink
+        ]);
+      } else if ($existingEpisode['link'] !== $streamtapeLink && $streamtapeLink !== null) {
+        // Update link if different and valid
+        $sql = "UPDATE anime_episodes SET link = :link WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+          "id" => $existingEpisode['id'],
           "link" => $streamtapeLink
         ]);
       }
-  
+    }
+
+    // Process genres only for new anime
+    if (!$anime && isset($genres)) {
       foreach ($genres as $genre) {
         $sql = "INSERT INTO anime_genres (anime_id, genre) VALUES (:anime_id, :genre)";
         $stmt = $pdo->prepare($sql);
@@ -181,9 +209,9 @@ function saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $status) {
           "genre" => $genre
         ]);
       }
-
-      $pdo->commit();
     }
+
+    $pdo->commit();
   } catch (PDOException $e) {
     if ($pdo->inTransaction()) {
       $pdo->rollBack();

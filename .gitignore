@@ -1,6 +1,7 @@
-/node_modules
-package-lock.json
 .DS_Store
 w3cErrors
-/includes/animeflv/images
+package-lock.json
+/node_modules
 /images/sites
+/includes/animeflv/images
+/includes/db.php

@@ -8,10 +8,10 @@ if ($anime_id > 0) {
   if ($anime) {
     echo json_encode($anime);
   } else {
-    echo json_encode(["error" => "Anime no encontrado"]);
+    echo json_encode(["error" => "Anime not found"]);
   }
 } else {
-  echo json_encode(["error" => "ID no válido"]);
+  echo json_encode(["error" => "Invalid ID"]);
 }
 
 function getAnimeDetails($pdo, $anime_id) {

@@ -35,43 +35,13 @@
       </div>
     </div>
   </nav>
-  <div class="section-row bg-purple-dark" id="hero">
+  <div class="section-row h-100 d-flex align-items-center justify-center" id="error-404">
     <div class="container-fluid">
-      <h1>Download Station</h1>
-      <p>Welcome to your centralized anime download hub, where you can explore our extensive collection from AnimeFLV and other popular sources. Access and manage your favorite anime series download episodes directly to your desktop or Synology NAS. Whether you're building a personal library or setting up your media server, we provide a seamless downloading experience with direct downloads and Synology Download Station integration. Simple, efficient, and organized: everything you need in one place.</p>
-    </div>
-
-    <svg viewBox="0 0 1920 60" aria-hidden="true">
-      <path fill="#0b0c2a" d="M-153.5,85.5a4002.033,4002.033,0,0,1,658-71c262.854-6.5,431.675,15.372,600,27,257.356,17.779,624.828,19.31,1089-58v102Z"></path>
-    </svg>
-  </div>
-  <div class="section-row" id="site-cards">
-    <div class="container-fluid">
-      <?php
-    require_once './includes/db.php';
-    
-    $sql = "SELECT * FROM sites ORDER BY created_at ASC";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $sites = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    ?>
-      <div class="row">
-        <?php
-      foreach ($sites as $site) {
-        $siteName = strtolower(preg_replace('/[^a-zA-Z0-9]/', '-', $site['name']));
-        ?>
-        <div class="col-12 col-md-6 col-lg-4">
-          <div class="<?php echo $siteName; ?> site-card d-flex flex-column align-items-center">
-            <div class="image">
-              <a href="./<?php echo $siteName; ?>.php">
-                <img src="<?php echo $site['image_url']; ?>" alt="<?php echo $site['name']; ?> logo">
-              </a>
-            </div>
-          </div>
-        </div>
-        <?php
-      }
-      ?>
+      <div class="error-content text-center">
+        <h1>404</h1>
+        <h2>Page Not Found</h2>
+        <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+        <a href="/" class="btn btn-secondary">Back to Home</a>
       </div>
     </div>
   </div>

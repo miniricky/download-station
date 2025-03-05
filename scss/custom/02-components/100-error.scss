@@ -1,0 +1,24 @@
+#error-404 {
+  .error-content {
+    h1 {
+      font-size: 120px;
+      margin-bottom: 0;
+
+      + * {
+        margin-top: 20px;
+      }
+    }
+
+    h2 {
+      + * {
+        margin-top: 30px;
+      }
+    }
+
+    p {
+      + * {
+        margin-top: 30px;
+      }
+    }
+  }
+}

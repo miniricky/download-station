@@ -34,6 +34,8 @@ jobs:
           --exclude='.git' \
           --exclude='generators' \
           --exclude='gulpfile.js' \
+          --exclude='images/sites/**' \
+          --exclude='includes/animeflv/images/**' \
           --exclude='js-src' \
           --exclude='node_modules' \
           --exclude='package.json' \
@@ -41,4 +43,7 @@ jobs:
           --exclude='README.md' \
           --exclude='scss' \
           --exclude='templates' \
+          --filter='protect images/sites/' \
+          --filter='protect includes/animeflv/images/' \
+          --filter='protect includes/db.php' \
           ./ miniricky@100.125.23.21:/volume1/sites/download-station

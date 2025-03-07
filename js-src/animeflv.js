@@ -283,14 +283,10 @@
         const overlay = document.querySelector('.loader-overlay');
         overlay.classList.remove('visually-hidden');
 
-        const nodeServer = window.location.hostname === 'download-station.test'
-          ? 'http://localhost:3000/scrape/streamtape'
-          : 'http://192.168.1.69:3000/scrape/streamtape';
-
-        fetch(nodeServer, {
+        fetch('../includes/animeflv/streamtape.php', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: scrapeUrl })
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `url=${encodeURIComponent(scrapeUrl)}`
         })
         .then(response => {
           if (!response.ok) {
@@ -300,24 +296,16 @@
               const toastBody = toast.querySelector('.toast-body');
               toastBody.textContent = 'Sorry, the video is unreachable.';
 
-              // Configure toast options
               const toastOptions = {
                 animation: true,
                 autohide: true,
                 delay: 3000
               };
 
-              // Initialize and show toast
               const bsToast = bootstrap.Toast.getOrCreateInstance(toast, toastOptions);
               bsToast.show();
             }
-            
-            if (response.status === 400) {
-              const errorMessage = 'page is unreachable.';
-              console.log(errorMessage);
-              return Promise.reject('Page is unreachable');
-            }
-            return Promise.reject(new Error('Bad Request'));
+            return Promise.reject(new Error(response.status === 400 ? 'Page is unreachable' : 'Bad Request'));
           }
           return response.json();
         })
@@ -335,10 +323,10 @@
           }
         })
         .catch(error => {
-          if (error !== 'Page is unreachable' && error.message !== 'Bad Request') {
+          if (error.message !== 'Page is unreachable' && error.message !== 'Bad Request') {
             console.log('Error in scrapingStreamtape:', error);
           }
-        })
+        });
       }
 
       /*

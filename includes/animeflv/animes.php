@@ -159,6 +159,31 @@ function saveAnime($pdo, $title, $type, $link, $urlImage, $site_id, $status) {
         "status" => $status
       ]);
       $anime_id = $pdo->lastInsertId();
+
+      // Better language handling
+      try {
+        $sql = "INSERT INTO languages (name) VALUES ('Español Subtitulado')";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        $language_id = $pdo->lastInsertId();
+      } catch (PDOException $e) {
+        if ($e->getCode() == 23000) {
+          $sql = "SELECT id FROM languages WHERE name = 'Español Subtitulado'";
+          $stmt = $pdo->prepare($sql);
+          $stmt->execute();
+          $language_id = $stmt->fetchColumn();
+        } else {
+          throw $e;
+        }
+      }
+
+      // Link anime with language
+      $sql = "INSERT INTO anime_languages (anime_id, language_id) VALUES (:anime_id, :language_id)";
+      $stmt = $pdo->prepare($sql);
+      $stmt->execute([
+        "anime_id" => $anime_id,
+        "language_id" => $language_id
+      ]);
     } else {
       $anime_id = $anime['id'];
       $extraData = getAnimeDetails($link);

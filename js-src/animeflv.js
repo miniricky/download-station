@@ -283,8 +283,11 @@
         const overlay = document.querySelector('.loader-overlay');
         overlay.classList.remove('visually-hidden');
 
-        const url = 'http://localhost:3000/scrape/streamtape';
-        fetch(url, {
+        const nodeServer = window.location.hostname === 'download-station.test'
+          ? 'http://localhost:3000/scrape/streamtape'
+          : 'http://192.168.1.69:3000/scrape/streamtape';
+
+        fetch(nodeServer, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: scrapeUrl })

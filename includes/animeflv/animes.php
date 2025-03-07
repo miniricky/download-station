@@ -249,7 +249,7 @@ function downloadImage($url, $directory, $title) {
 function getAnimeDetails($animeUrl) {
   $nodeServer = $_SERVER['HTTP_HOST'] === 'download-station.test' 
     ? "http://localhost:3000/scrape/anime"
-    : "https://192.168.101.11:3000/scrape/anime";
+    : "http://192.168.1.69:3000/scrape/anime";
 
   $postData = json_encode(["url" => $animeUrl]);
 

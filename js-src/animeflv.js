@@ -36,19 +36,24 @@
         const extraContainer = document.createElement('div');
         extraContainer.classList.add('anime-detail', 'col-12');
         extraContainer.setAttribute('data-anime-id', animeID);
-        extraContainer.textContent = 'Contenedor Extra';
+        extraContainer.textContent = 'Extra Container';
 
         if (insertIndex < allAnimeWrappers.length) {
-          animeContainer.insertBefore(extraContainer, allAnimeWrappers[insertIndex]);
+          animeContainer.insertBefore(extraContainer, allAnimeWrappers[insertIndex], { preventScroll: true });
         } else {
           animeContainer.appendChild(extraContainer);
         }
+
+        // Trigger animation after insert
+        requestAnimationFrame(() => {
+          extraContainer.classList.add('show');
+        });
 
         fetch(`../includes/animeflv/anime-data.php?anime_id=${animeID}`)
         .then(response => response.json())
         .then(data => {
           if (data.error) {
-            extraContainer.textContent = 'Error al cargar la información.';
+            extraContainer.textContent = 'Error loading information.';
             return;
           }
 

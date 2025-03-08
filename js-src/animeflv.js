@@ -127,14 +127,21 @@
                   url += '&episodes[]=' + encodeURIComponent(element.querySelector('a').textContent);
                 });
 
-                validateEpisodes(url, data.episodes, container);
+                if (data.episodes && data.episodes.length > 0) {
+                  validateEpisodes(url, data.episodes, container);
+                } else {
+                  const synologyTab = container.querySelector('#synology-tab-pane');
+                  synologyTab.innerHTML = '<p>No episodes available for this anime.</p>';
+                  const desktopTab = container.querySelector('#desktop-tab-pane');
+                  desktopTab.innerHTML = '<p>No episodes available for this anime.</p>';
+                }
               }
             });
           }
         })
         .catch(error => {
-          console.error('Error al obtener datos:', error);
-          extraContainer.textContent = 'No se pudo cargar la información.';
+          console.error('Error getting data:', error);
+          extraContainer.textContent = 'The information could not be loaded.';
         });
       }
 

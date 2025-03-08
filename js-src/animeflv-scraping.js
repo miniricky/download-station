@@ -1,11 +1,6 @@
 (function ($) {
   document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.includes('sites.php')) {
-      // Add the server URL validation
-      const nodeServer = window.location.host === 'download-station.test'
-        ? 'http://localhost:3000'
-        : 'http://192.168.1.69:3000';
-
       document.querySelectorAll(".animeflv-status").forEach(button => {
         button.addEventListener("click", function() {
           getAnimeData(this.id);
@@ -18,8 +13,8 @@
         let totalPages = 1;
         let page = 1;
 
-        // Update fetch URLs to use nodeServer
-        fetch(`${nodeServer}/scrape/anime-list?status=${status}&firstRequest=true`)
+        // Update fetch URLs to use PHP proxy
+        fetch(`includes/animeflv/proxy.php?endpoint=anime-list&status=${status}&firstRequest=true`)
         .then(response => response.json())
         .then(data => {
           if (data.status === 'Error') {
@@ -44,7 +39,7 @@
             return;
           }
   
-          fetch(`${nodeServer}/scrape/anime-list?page=${page}&status=${status}`)
+          fetch(`includes/animeflv/proxy.php?endpoint=anime-list&page=${page}&status=${status}`)
           .then(response => response.json())
           .then(data => {
             const progress = Math.round((page / totalPages) * 100);

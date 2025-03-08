@@ -1,23 +1,25 @@
 (function ($) {
   document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.includes('sites.php')) {
+      // Add the server URL validation
+      const nodeServer = window.location.host === 'download-station.test'
+        ? 'http://localhost:3000'
+        : 'http://192.168.1.69:3000';
+
       document.querySelectorAll(".animeflv-status").forEach(button => {
         button.addEventListener("click", function() {
           getAnimeData(this.id);
         });
       });
 
-      /*
-      * Function for get anime data.
-      */
       function getAnimeData(status) {
         const container = document.querySelector('#sites');
         const wrapper = container.querySelector('.progress-wrapper');
         let totalPages = 1;
         let page = 1;
 
-        // First request to get the total number of pages
-        fetch(`../includes/animeflv/animes.php?status=${status}&firstRequest=true`)
+        // Update fetch URLs to use nodeServer
+        fetch(`${nodeServer}/scrape/anime-list?status=${status}&firstRequest=true`)
         .then(response => response.json())
         .then(data => {
           if (data.status === 'Error') {
@@ -42,7 +44,7 @@
             return;
           }
   
-          fetch(`../includes/animeflv/animes.php?page=${page}&status=${status}`)
+          fetch(`${nodeServer}/scrape/anime-list?page=${page}&status=${status}`)
           .then(response => response.json())
           .then(data => {
             const progress = Math.round((page / totalPages) * 100);

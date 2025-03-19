@@ -163,6 +163,8 @@
               .dot-wrapper{
                 #episode-list{
                   text-indent: -99999999px;
+                  display: flex;
+                  gap: 5px;
   
                   a.list-group-item-action{
                     position: relative;
@@ -202,10 +204,6 @@
                     &:focus{
                       background-color: transparent;
                       outline-offset: -2px;
-                    }
-
-                    + *{
-                      margin-top: 5px;
                     }
                   }
 

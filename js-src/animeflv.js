@@ -80,7 +80,7 @@
                 </ul>
                 <div class="tab-content" id="animeflvTabContent">
                   <div class="tab-pane fade show active" id="desktop-tab-pane" role="tabpanel" aria-labelledby="desktop-tab" tabindex="0">
-                    <div class="scrollspy-wrapper d-flex gap-4">
+                    <div class="scrollspy-wrapper d-flex ${data.episodes.length > 15 ? ' flex-column gap-1' : ' gap-4'}">
                       <div class="episode-wrapper">
                         <div data-bs-spy="scroll" data-bs-target="#episode-list" data-bs-smooth-scroll="true" class="scrollspy-animeflv">
                           ${Array.from({ length: Math.ceil(data.episodes.length / 7) }, (_, i) => {
@@ -104,7 +104,7 @@
                     
                       ${data.episodes.length > 7 ? `
                         <div class="dot-wrapper">
-                          <div id="episode-list" class="list-group">
+                          <div id="episode-list" class="list-group ${data.episodes.length > 15 ? 'episode-column d-flex flex-row flex-wrap' : ''}">
                             ${Array.from({ length: Math.ceil(data.episodes.length / 7) }, (_, i) => {
                               const start = i * 7 + 1;
                               const end = Math.min((i + 1) * 7, data.episodes.length);
@@ -142,9 +142,48 @@
             // Initialize tooltips
             const tooltipTriggerList = container.querySelectorAll('[data-bs-toggle="tooltip"]');
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
+              const episodeList = document.querySelector('#episode-list');
+              const hasEpisodeColumn = episodeList && episodeList.classList.contains('episode-column');
+              
               const tooltip = new bootstrap.Tooltip(tooltipTriggerEl, {
                 trigger: 'manual',
-                boundary: 'window'
+                boundary: 'window',
+                placement: hasEpisodeColumn ? 'bottom' : 'right',
+                popperConfig: hasEpisodeColumn ? {
+                  modifiers: [
+                    {
+                      name: 'computeStyles',
+                      options: {
+                        adaptive: false
+                      }
+                    },
+                    {
+                      name: 'preventOverflow',
+                      options: {
+                        boundary: 'window'
+                      }
+                    },
+                    {
+                      name: 'applyStyles',
+                      fn: ({ state }) => {
+                        if (state.elements.popper) {
+                          const episodeList = document.querySelector('#episode-list');
+                          if (episodeList && episodeList.classList.contains('episode-column')) {
+                            const rect = episodeList.getBoundingClientRect();
+                            const targetRect = state.elements.reference.getBoundingClientRect();
+                            
+                            Object.assign(state.elements.popper.style, {
+                              position: 'fixed',
+                              top: `${rect.bottom}px`,
+                              left: `${rect.left}px`,
+                              transform: 'none'
+                            });
+                          }
+                        }
+                      }
+                    }
+                  ]
+                } : null
               });
 
               // Show tooltip if initially active

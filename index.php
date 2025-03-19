@@ -7,7 +7,6 @@
   <meta name="description" content="">
   <title>Download Station</title>
 
-  <!-- CSS styles -->
   <link href="./css/style.min.css" rel="stylesheet">
 </head>
 
@@ -21,11 +20,11 @@
       <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/">Home</a>
+            <a class="nav-link active" aria-current="page" href="/">Inicio</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Sites
+              Sitios
             </a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="/animeflv.php">AnimeFlV</a></li>
@@ -38,7 +37,7 @@
   <div class="section-row bg-purple-dark" id="hero">
     <div class="container-fluid">
       <h1>Download Station</h1>
-      <p>Welcome to your centralized anime download hub, where you can explore our extensive collection from AnimeFLV and other popular sources. Access and manage your favorite anime series download episodes directly to your desktop or Synology NAS. Whether you're building a personal library or setting up your media server, we provide a seamless downloading experience with direct downloads and Synology Download Station integration. Simple, efficient, and organized: everything you need in one place.</p>
+      <p>Bienvenido a tu plataforma centralizada de descargas de anime, donde podrás explorar nuestra extensa colección de AnimeFLV y otras fuentes populares. Accede y gestiona los episodios de descarga de tus series de anime favoritas directamente en tu ordenador o Synology NAS. Tanto si creas una biblioteca personal como si configuras tu servidor multimedia, te ofrecemos una experiencia de descarga fluida con descargas directas e integración con Synology Download Station. Sencillo, eficiente y organizado: todo lo que necesitas en un solo lugar.</p>
     </div>
 
     <svg viewBox="0 0 1920 60" aria-hidden="true">
@@ -77,7 +76,7 @@
   </div>
   <footer class="footer mt-auto py-3 text-center bg-purple-dark">
     <div class="container">
-      <span>© Copyright 2025 — Download Station. All rights reserved. Created by <a class="underline-link" href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
+      <span>© Copyright 2025 — Download Station. Todos los derechos reservados. Creado por <a class="underline-link" href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
     </div>
   </footer>
   <script src="./js/scripts-all.min.js"></script>

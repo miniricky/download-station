@@ -7,7 +7,6 @@
   <meta name="description" content="">
   <title>Download Station</title>
 
-  <!-- CSS styles -->
   <link href="./css/style.min.css" rel="stylesheet">
 </head>
 
@@ -21,11 +20,11 @@
       <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/">Home</a>
+            <a class="nav-link active" aria-current="page" href="/">Inicio</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Sites
+              Sitios
             </a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="/animeflv.php">AnimeFlV</a></li>
@@ -48,15 +47,15 @@
         <div class="sidebar col-12 col-lg-4 col-xl-3">
           <div class="sticky-lg-top">
             <div class="search-container">
-              <label for="animeSearch" class="form-label h4">Search</label>
-              <input class="form-control" type="search" id="animeSearch" placeholder="Type to search..." autocomplete="off">
+              <label for="animeSearch" class="form-label h4">Buscar</label>
+              <input class="form-control" type="search" id="animeSearch" placeholder="Escribe para buscar..." autocomplete="off">
               <div id="animeSearchHelpBlock" class="form-text text-white">
-                The search and filters are independently.
+                La búsqueda y los filtros son independientes.
               </div>
             </div>
 
             <div class="filters-container">
-              <h2 class="h4">Filters</h2>
+              <h2 class="h4">Filtros</h2>
 
               <div class="genres-wrapper">
                 <?php
@@ -75,7 +74,7 @@
               ?>
                 <div class="dropdown w-100">
                   <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Select Genres
+                    Seleccionar géneros
                   </button>
                   <ul class="dropdown-menu w-100">
                     <?php foreach ($genres as $genre): ?>
@@ -110,7 +109,7 @@
               ?>
                 <div class="dropdown w-100">
                   <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Select Type
+                    Seleccionar tipo
                   </button>
                   <ul class="dropdown-menu w-100">
                     <?php foreach ($types as $type): ?>
@@ -143,7 +142,7 @@
               ?>
                 <div class="dropdown w-100">
                   <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Select Status
+                    Seleccionar estado
                   </button>
                   <ul class="dropdown-menu w-100">
                     <?php foreach ($statuses as $status): ?>
@@ -245,11 +244,11 @@
                   echo '<span class="type">' . $anime['status'] . '</span></div>';
                   echo '<div class="text">';
                   echo '<h2 class="h6">' . $anime['title'] . '</h2></div>';
-                  echo '<button type="button" class="btn btn-link episodes viewEpisodes">Episodes</button>';
+                  echo '<button type="button" class="btn btn-link episodes viewEpisodes">Episodios</button>';
                   echo "</div></div>";
                 }
               } else {
-                echo "No animes found for the site '$site_name'.";
+                echo "No se encontraron animes para el sitio '$site_name'.";
               }
             } catch (PDOException $e) {
               echo "Error in query: " . $e->getMessage();
@@ -319,35 +318,35 @@
     <div class="modal-dialog modal-fullscreen">
       <div class="modal-content bg-purple text-white">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">Synology Credentials</h1>
+          <h1 class="modal-title fs-5">Credenciales de Synology</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="section-row h-100" id="sid">
             <div class="container h-100 align-content-center">
               <form id="sid-form">
-                <h1 class="h3 fw-normal">Add your credentials</h1>
+                <h1 class="h3 fw-normal">Añade tus credenciales</h1>
 
-                <label for="username">Username</label>
-                <input type="text" class="form-control" id="username" aria-describedby="username" placeholder="Username">
+                <label for="username">Usuario</label>
+                <input type="text" class="form-control" id="username" aria-describedby="username" placeholder="Usuario">
 
-                <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" aria-describedby="password" placeholder="Password" autocomplete="current-password">
+                <label for="password">Contraseña</label>
+                <input type="password" class="form-control" id="password" aria-describedby="password" placeholder="Contraseña" autocomplete="current-password">
 
-                <label for="domain">Domain</label>
-                <input type="text" class="form-control" id="domain" aria-describedby="domain" placeholder="Domain">
+                <label for="domain">Dominio</label>
+                <input type="text" class="form-control" id="domain" aria-describedby="domain" placeholder="Dominio">
 
                 <span id="session" class="form-text d-block text-white">
-                  Your credentials are only saved in cookies, not in the database.
+                  Sus credenciales solo se guardan en las cookies, no en la base de datos.
                 </span>
 
-                <button class="btn btn-secondary w-100 py-2" id="" type="submit">Add credentials</button>
+                <button class="btn btn-secondary w-100 py-2" id="" type="submit">Agregar credenciales</button>
               </form>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
@@ -361,14 +360,14 @@
   <div class="loader-overlay visually-hidden">
     <div class="loader-content">
       <div class="spinner-border text-primary mb-2" role="status">
-        <span class="visually-hidden">Loading.. .</span>
+        <span class="visually-hidden">Cargando.. .</span>
       </div>
-      <div>Processing download request</div>
+      <div>Procesando solicitud de descarga</div>
     </div>
   </div>
   <footer class="footer mt-auto py-3 text-center bg-purple-dark">
     <div class="container">
-      <span>© Copyright 2025 — Download Station. All rights reserved. Created by <a class="underline-link" href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
+      <span>© Copyright 2025 — Download Station. Todos los derechos reservados. Creado por <a class="underline-link" href="https://cv.miniricky.dev" target="_blank" rel="noopener noreferrer">Miniricky</a></span>
     </div>
   </footer>
   <script src="./js/scripts-all.min.js"></script>

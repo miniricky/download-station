@@ -141,6 +141,79 @@
                 margin-top: 15px;
               }
             }
+
+            #desktop-tab-pane,
+            #synology-tab-pane{
+              .episode-wrapper{
+                width: 100%;
+
+                .scrollspy-animeflv{
+                  height: 400px;
+                  overflow-y: auto;
+                  
+                  &::-webkit-scrollbar {
+                    display: none;
+                  }
+                }
+
+                + *{
+                  padding: 10px 0 0 0;
+                }
+              }
+
+              .dot-wrapper{
+                #episode-list{
+                  max-height: 380px;
+                  overflow: auto;
+                  text-indent: -99999999px;
+  
+                  a.list-group-item-action{
+                    position: relative;
+                    padding: 0;
+                    border: none;
+                    width: 20px;
+                    height: 20px;
+
+                    &:after {
+                      content: '';
+                      position: absolute;
+                      top: 50%;
+                      left: 50%;
+                      display: block;
+                      @include mask-image(url("../images/fontawesome/circle-regular.svg"));
+                      @include mask-repeat(no-repeat);
+                      @include mask-size(12px 12px);
+                      width: 12px;
+                      height: 12px;
+                      background: $white;
+                      @include transform(translate(-50%, -50%));
+                    }
+
+                    &.active,
+                    &:hover{
+                      background-color: transparent;
+
+                      &::after{
+                        @include mask-image(url("../images/fontawesome/circle-dot-regular.svg"));
+                        @include mask-size(20px 20px);
+                        width: 20px;
+                        height: 20px;
+                        background-color: $red;
+                      }
+                    }
+
+                    &:focus{
+                      background-color: transparent;
+                      outline-offset: -2px;
+                    }
+
+                    + *{
+                      margin-top: 5px;
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

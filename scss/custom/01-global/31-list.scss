@@ -10,33 +10,14 @@ ul.list-group{
     
     a,
     span{
-      padding: 16px 35px 16px 16px;
+      padding: 16px 45px 16px 16px;
 
       + *{
         margin-top: 5px;
       }
     }
 
-    a{
-      position: relative;
-      display: block;
-
-      &:after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        right: 10px;
-        display: block;
-        @include mask-image(url("../images/fontawesome/download-solid.svg"));
-        @include mask-repeat(no-repeat);
-        @include mask-size(15px 15px);
-        width: 15px;
-        height: 15px;
-        background: $white;
-        @include transform(translateY(-50%) translateX(0));
-      }
-    }
-    
+    a,
     span{
       position: relative;
       display: block;
@@ -45,15 +26,26 @@ ul.list-group{
         content: '';
         position: absolute;
         top: 50%;
-        right: 10px;
+        right: 20px;
         display: block;
-        @include mask-image(url("../images/fontawesome/server-solid.svg"));
         @include mask-repeat(no-repeat);
         @include mask-size(15px 15px);
         width: 15px;
         height: 15px;
         background: $white;
         @include transform(translateY(-50%) translateX(0));
+      }
+    }
+
+    a{
+      &:after {
+        @include mask-image(url("../images/fontawesome/download-solid.svg"));
+      }
+    }
+
+    span{
+      &:after {
+        @include mask-image(url("../images/fontawesome/server-solid.svg"));
       }
     }
 

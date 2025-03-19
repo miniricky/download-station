@@ -53,7 +53,7 @@
         .then(response => response.json())
         .then(data => {
           if (data.error) {
-            extraContainer.textContent = 'Error loading information.';
+            extraContainer.textContent = 'Error al cargar la información.';
             return;
           }
 
@@ -80,9 +80,45 @@
                 </ul>
                 <div class="tab-content" id="animeflvTabContent">
                   <div class="tab-pane fade show active" id="desktop-tab-pane" role="tabpanel" aria-labelledby="desktop-tab" tabindex="0">
-                    <ul class="list-group list-group-flush">
-                      ${data.episodes.map(ch => `<li class="list-group-item"><a class="download-desktop" href="${ch.link}" target="_blank">Episode ${ch.episode_number}</a></li>`).join('')}
-                    </ul>
+                    <div class="scrollspy-wrapper d-flex gap-4">
+                      <div class="episode-wrapper">
+                        <div data-bs-spy="scroll" data-bs-target="#episode-list" data-bs-smooth-scroll="true" class="scrollspy-animeflv">
+                          ${Array.from({ length: Math.ceil(data.episodes.length / 7) }, (_, i) => {
+                            const groupEpisodes = data.episodes.slice(i * 7, (i + 1) * 7);
+                            return `
+                              <div id="episode-group-${i + 1}" class="h-100">
+                                <h3 class="d-none">Episodes ${i * 7 + 1}-${Math.min((i + 1) * 7, data.episodes.length)}</h4>
+                                <ul class="list-group list-group-flush">
+                                  ${groupEpisodes.map(ch => `
+                                    <li class="list-group-item">
+                                      <a class="download-desktop" href="${ch.link}" target="_blank">
+                                        Episodio ${ch.episode_number}
+                                      </a>
+                                    </li>
+                                  `).join('')}
+                                </ul>
+                              </div>
+                            `;
+                          }).join('')}
+                        </div>
+                      </div>
+                    
+                      ${data.episodes.length > 7 ? `
+                        <div class="dot-wrapper">
+                          <div id="episode-list" class="list-group">
+                            ${Array.from({ length: Math.ceil(data.episodes.length / 7) }, (_, i) => {
+                              const start = i * 7 + 1;
+                              const end = Math.min((i + 1) * 7, data.episodes.length);
+                              return `
+                                <a class="list-group-item list-group-item-action custom-tooltip ${i === 0 ? 'active' : ''}" href="#episode-group-${i + 1}" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip" data-bs-title="Episodios del ${start} - ${end}">
+                                  Episodes ${start}-${end}
+                                </a>
+                              `;
+                            }).join('')}
+                          </div>
+                        </div>
+                      ` : ''}
+                    </div>
                   </div>
                   <div class="tab-pane fade" id="synology-tab-pane" role="tabpanel" aria-labelledby="synology-tab" tabindex="0">
                     ${window.loginForm}
@@ -91,6 +127,96 @@
               </div>
             </div>
           `;
+
+          // Initialize tooltips
+          const tooltipTriggerList = container.querySelectorAll('[data-bs-toggle="tooltip"]');
+          const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
+            const tooltip = new bootstrap.Tooltip(tooltipTriggerEl, {
+              trigger: 'manual',
+              boundary: 'window'
+            });
+          
+            // Show tooltip if initially active
+            if (tooltipTriggerEl.classList.contains('active')) {
+              tooltip.show();
+            }
+          
+            // Handle class changes
+            const observer = new MutationObserver(() => {
+              const isActive = tooltipTriggerEl.classList.contains('active');
+              if (isActive && !tooltip._isShown()) {
+                tooltip.show();
+              } else if (!isActive && tooltip._isShown()) {
+                tooltip.hide();
+              }
+            });
+          
+            observer.observe(tooltipTriggerEl, { 
+              attributes: true,
+              attributeFilter: ['class']
+            });
+          
+            return tooltip;
+          });
+          
+          // After initializing tooltips, update this section
+          const scrollSpyElement = container.querySelector('[data-bs-spy="scroll"]');
+          if (scrollSpyElement) {
+            const scrollSpy = new bootstrap.ScrollSpy(scrollSpyElement, {
+              target: '#episode-list',
+              offset: 0
+            });
+          
+            // Throttle scroll updates
+            let lastScroll = 0;
+            scrollSpyElement.addEventListener('scroll', () => {
+              const now = Date.now();
+              if (now - lastScroll > 50) {
+                scrollSpy.refresh();
+                lastScroll = now;
+                const scrollspyContainer = container.querySelector('.scrollspy-animeflv');
+                const containerRect = scrollspyContainer.getBoundingClientRect();
+                
+                document.querySelectorAll('#episode-list .list-group-item-action').forEach(item => {
+                  const targetId = item.getAttribute('href');
+                  const targetElement = container.querySelector(targetId);
+                  const elementRect = targetElement.getBoundingClientRect();
+                  
+                  if (elementRect.top - containerRect.top <= 10) {
+                    item.classList.add('active');
+                    const tooltip = bootstrap.Tooltip.getInstance(item);
+                    if (tooltip) tooltip.show();
+                  } else {
+                    item.classList.remove('active');
+                    const tooltip = bootstrap.Tooltip.getInstance(item);
+                    if (tooltip) tooltip.hide();
+                  }
+                });
+              }
+            }, { passive: true });
+          }
+
+          // Update click handler
+          const episodeLinks = container.querySelectorAll('#episode-list .list-group-item-action');
+          episodeLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+              e.preventDefault();
+              const targetId = this.getAttribute('href');
+              const targetElement = container.querySelector(targetId);
+              
+              const scrollspyContainer = container.querySelector('.scrollspy-animeflv');
+              // Calculate position relative to the scrollspy container
+              const targetPosition = targetElement.getBoundingClientRect().top - 
+                                    scrollspyContainer.getBoundingClientRect().top + 
+                                    scrollspyContainer.scrollTop;
+              
+              scrollspyContainer.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+              });
+            });
+          });
+          
 
           container.querySelectorAll('.download-desktop').forEach(button => {
             button.addEventListener('click', function(e) {
@@ -110,7 +236,7 @@
               if (!pathStatus) {
                 const synologyTab = container.querySelector('#synology-tab-pane');
                 const paragraph = document.createElement('p');
-                paragraph.innerHTML = 'You need to create anime shared folder in your Synology NAS and reload the page. <a href="#" class="reload-page">Click here to reload the page</a>.';
+                paragraph.innerHTML = 'Debe crear una carpeta compartida de anime en su Synology NAS y volver a cargar la página. <a href="#" class="reload-page">Haga clic aquí para recargar la página</a>.';
 
                 paragraph.querySelector('.reload-page').addEventListener('click', function(e) {
                   e.preventDefault();
@@ -131,9 +257,9 @@
                   validateEpisodes(url, data.episodes, container);
                 } else {
                   const synologyTab = container.querySelector('#synology-tab-pane');
-                  synologyTab.innerHTML = '<p>No episodes available for this anime.</p>';
+                  synologyTab.innerHTML = '<p>No hay episodios disponibles para este anime.</p>';
                   const desktopTab = container.querySelector('#desktop-tab-pane');
-                  desktopTab.innerHTML = '<p>No episodes available for this anime.</p>';
+                  desktopTab.innerHTML = '<p>No hay episodios disponibles para este anime.</p>';
                 }
               }
             });
@@ -141,7 +267,7 @@
         })
         .catch(error => {
           console.error('Error getting data:', error);
-          extraContainer.textContent = 'The information could not be loaded.';
+          extraContainer.textContent = 'No se pudo cargar la información.';
         });
       }
 
@@ -194,7 +320,7 @@
           var episodesArray = [];
 
           episodes.forEach(episode => { 
-            var filteredEpisodes = data.verify.filter(ep => ep.episode === 'Episode ' + episode.episode_number);
+            var filteredEpisodes = data.verify.filter(ep => ep.episode === 'Episodio ' + episode.episode_number);
 
             if (filteredEpisodes.length !== 0) {
               status = filteredEpisodes[0].status;
@@ -235,7 +361,7 @@
               span.classList.add('text-white');
               span.dataset.bsToggle = 'tooltip';
               span.dataset.bsPlacement = 'top';
-              span.setAttribute('title', 'Episode already downloaded');
+              span.setAttribute('title', 'Episodio ya descargado');
               span.textContent = 'Episode ' + episode.episode;
 
               listItem.appendChild(span);
@@ -306,7 +432,7 @@
               overlay.classList.add('visually-hidden');
               const toast = document.querySelector('.toast');
               const toastBody = toast.querySelector('.toast-body');
-              toastBody.textContent = 'Sorry, the video is unreachable.';
+              toastBody.textContent = 'Lo sentimos, el video no está disponible.';
 
               const toastOptions = {
                 animation: true,
@@ -331,7 +457,7 @@
               sendURL("https:" + result.data.src, title, episode, result.data.title, item, overlay, type);
             }
           } else {
-            console.log('Download link not found.');
+            console.log('Enlace de descarga no encontrado.');
           }
         })
         .catch(error => {
@@ -436,7 +562,7 @@
               span.classList.add('text-white');
               span.dataset.bsToggle = 'tooltip';
               span.dataset.bsPlacement = 'top';
-              span.setAttribute('title', 'Episode already downloaded');
+              span.setAttribute('title', 'Episodio ya descargado');
               span.textContent = episode;
 
               list.replaceChild(span, downloadLink);

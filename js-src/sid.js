@@ -20,7 +20,7 @@
           login(username, password, domain, sidForm);
         }
         else{
-          console.log('Please complete all fields.');
+          console.log('Por favor complete todos los campos.');
         }
       });
 

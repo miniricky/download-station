@@ -6,7 +6,6 @@
     <meta name="description" content="">
     <title>Download Station</title>
 
-    <!-- CSS styles -->
     <link href="./css/style.min.css" rel="stylesheet">
   </head>
 

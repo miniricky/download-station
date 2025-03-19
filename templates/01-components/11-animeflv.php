@@ -11,15 +11,15 @@
       <div class="sidebar col-12 col-lg-4 col-xl-3">
         <div class="sticky-lg-top">
           <div class="search-container">
-            <label for="animeSearch" class="form-label h4">Search</label>
-            <input class="form-control" type="search" id="animeSearch" placeholder="Type to search..." autocomplete="off">
+            <label for="animeSearch" class="form-label h4">Buscar</label>
+            <input class="form-control" type="search" id="animeSearch" placeholder="Escribe para buscar..." autocomplete="off">
             <div id="animeSearchHelpBlock" class="form-text text-white">
-              The search and filters are independently.
+              La búsqueda y los filtros son independientes.
             </div>
           </div>
 
           <div class="filters-container">
-            <h2 class="h4">Filters</h2>
+            <h2 class="h4">Filtros</h2>
 
             <div class="genres-wrapper">
               <?php
@@ -38,7 +38,7 @@
               ?>
               <div class="dropdown w-100">
                 <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Select Genres
+                  Seleccionar géneros
                 </button>
                 <ul class="dropdown-menu w-100">
                   <?php foreach ($genres as $genre): ?>
@@ -76,7 +76,7 @@
               ?>
               <div class="dropdown w-100">
                 <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Select Type
+                  Seleccionar tipo
                 </button>
                 <ul class="dropdown-menu w-100">
                   <?php foreach ($types as $type): ?>
@@ -112,7 +112,7 @@
               ?>
               <div class="dropdown w-100">
                 <button class="btn btn-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Select Status
+                  Seleccionar estado
                 </button>
                 <ul class="dropdown-menu w-100">
                   <?php foreach ($statuses as $status): ?>
@@ -217,11 +217,11 @@
                   echo '<span class="type">' . $anime['status'] . '</span></div>';
                   echo '<div class="text">';
                   echo '<h2 class="h6">' . $anime['title'] . '</h2></div>';
-                  echo '<button type="button" class="btn btn-link episodes viewEpisodes">Episodes</button>';
+                  echo '<button type="button" class="btn btn-link episodes viewEpisodes">Episodios</button>';
                   echo "</div></div>";
                 }
               } else {
-                echo "No animes found for the site '$site_name'.";
+                echo "No se encontraron animes para el sitio '$site_name'.";
               }
             } catch (PDOException $e) {
               echo "Error in query: " . $e->getMessage();

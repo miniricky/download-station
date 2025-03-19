@@ -87,7 +87,6 @@
                             const groupEpisodes = data.episodes.slice(i * 7, (i + 1) * 7);
                             return `
                               <div id="episode-group-${i + 1}" class="h-100">
-                                <h3 class="d-none">Episodes ${i * 7 + 1}-${Math.min((i + 1) * 7, data.episodes.length)}</h4>
                                 <ul class="list-group list-group-flush">
                                   ${groupEpisodes.map(ch => `
                                     <li class="list-group-item">
@@ -110,7 +109,7 @@
                               const start = i * 7 + 1;
                               const end = Math.min((i + 1) * 7, data.episodes.length);
                               return `
-                                <a class="list-group-item list-group-item-action custom-tooltip ${i === 0 ? 'active' : ''}" href="#episode-group-${i + 1}" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip" data-bs-title="Episodios del ${start} - ${end}">
+                                <a class="list-group-item list-group-item-action custom-tooltip" href="#episode-group-${i + 1}" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip" data-bs-title="Episodios del ${start} - ${end}">
                                   Episodes ${start}-${end}
                                 </a>
                               `;
@@ -128,95 +127,49 @@
             </div>
           `;
 
-          // Initialize tooltips
-          const tooltipTriggerList = container.querySelectorAll('[data-bs-toggle="tooltip"]');
-          const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
-            const tooltip = new bootstrap.Tooltip(tooltipTriggerEl, {
-              trigger: 'manual',
-              boundary: 'window'
-            });
-          
-            // Show tooltip if initially active
-            if (tooltipTriggerEl.classList.contains('active')) {
-              tooltip.show();
-            }
-          
-            // Handle class changes
-            const observer = new MutationObserver(() => {
-              const isActive = tooltipTriggerEl.classList.contains('active');
-              if (isActive && !tooltip._isShown()) {
-                tooltip.show();
-              } else if (!isActive && tooltip._isShown()) {
-                tooltip.hide();
+          // Initialize ScrollSpy and tooltips after transition
+          extraContainer.addEventListener('transitionend', () => {
+            // Initialize ScrollSpy
+            const scrollSpyEl = document.querySelector('[data-bs-spy="scroll"]');
+            bootstrap.ScrollSpy.getOrCreateInstance(scrollSpyEl);
+            scrollSpyEl.addEventListener('activate.bs.scrollspy', (event) => {
+              const activeLink = event.relatedTarget;
+              if (activeLink) {
+                activeLink.classList.add('active');
               }
             });
-          
-            observer.observe(tooltipTriggerEl, { 
-              attributes: true,
-              attributeFilter: ['class']
-            });
-          
-            return tooltip;
-          });
-          
-          // After initializing tooltips, update this section
-          const scrollSpyElement = container.querySelector('[data-bs-spy="scroll"]');
-          if (scrollSpyElement) {
-            const scrollSpy = new bootstrap.ScrollSpy(scrollSpyElement, {
-              target: '#episode-list',
-              offset: 0
-            });
-          
-            // Throttle scroll updates
-            let lastScroll = 0;
-            scrollSpyElement.addEventListener('scroll', () => {
-              const now = Date.now();
-              if (now - lastScroll > 50) {
-                scrollSpy.refresh();
-                lastScroll = now;
-                const scrollspyContainer = container.querySelector('.scrollspy-animeflv');
-                const containerRect = scrollspyContainer.getBoundingClientRect();
-                
-                document.querySelectorAll('#episode-list .list-group-item-action').forEach(item => {
-                  const targetId = item.getAttribute('href');
-                  const targetElement = container.querySelector(targetId);
-                  const elementRect = targetElement.getBoundingClientRect();
-                  
-                  if (elementRect.top - containerRect.top <= 10) {
-                    item.classList.add('active');
-                    const tooltip = bootstrap.Tooltip.getInstance(item);
-                    if (tooltip) tooltip.show();
-                  } else {
-                    item.classList.remove('active');
-                    const tooltip = bootstrap.Tooltip.getInstance(item);
-                    if (tooltip) tooltip.hide();
-                  }
-                });
-              }
-            }, { passive: true });
-          }
 
-          // Update click handler
-          const episodeLinks = container.querySelectorAll('#episode-list .list-group-item-action');
-          episodeLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-              e.preventDefault();
-              const targetId = this.getAttribute('href');
-              const targetElement = container.querySelector(targetId);
-              
-              const scrollspyContainer = container.querySelector('.scrollspy-animeflv');
-              // Calculate position relative to the scrollspy container
-              const targetPosition = targetElement.getBoundingClientRect().top - 
-                                    scrollspyContainer.getBoundingClientRect().top + 
-                                    scrollspyContainer.scrollTop;
-              
-              scrollspyContainer.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
+            // Initialize tooltips
+            const tooltipTriggerList = container.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
+              const tooltip = new bootstrap.Tooltip(tooltipTriggerEl, {
+                trigger: 'manual',
+                boundary: 'window'
               });
+
+              // Show tooltip if initially active
+              if (tooltipTriggerEl.classList.contains('active')) {
+                tooltip.show();
+              }
+
+              // Handle class changes
+              const observer = new MutationObserver(() => {
+                const isActive = tooltipTriggerEl.classList.contains('active');
+                if (isActive && !tooltip._isShown()) {
+                  tooltip.show();
+                } else if (!isActive && tooltip._isShown()) {
+                  tooltip.hide();
+                }
+              });
+
+              observer.observe(tooltipTriggerEl, { 
+                attributes: true,
+                attributeFilter: ['class']
+              });
+
+              return tooltip;
             });
-          });
-          
+          }, { once: true });
 
           container.querySelectorAll('.download-desktop').forEach(button => {
             button.addEventListener('click', function(e) {

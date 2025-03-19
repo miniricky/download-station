@@ -76,7 +76,6 @@
       opacity: 0;
       transform: translateY(20px);
       transition: opacity 0.3s ease, transform 0.3s ease;
-      //margin: 2rem 0;
 
       .anime{
         display: flex;
@@ -163,8 +162,6 @@
 
               .dot-wrapper{
                 #episode-list{
-                  max-height: 380px;
-                  overflow: auto;
                   text-indent: -99999999px;
   
                   a.list-group-item-action{
@@ -210,6 +207,10 @@
                     + *{
                       margin-top: 5px;
                     }
+                  }
+
+                  &::-webkit-scrollbar {
+                    display: none;
                   }
                 }
               }

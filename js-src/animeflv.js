@@ -80,7 +80,7 @@
                 </ul>
                 <div class="tab-content" id="animeflvTabContent">
                   <div class="tab-pane fade show active" id="desktop-tab-pane" role="tabpanel" aria-labelledby="desktop-tab" tabindex="0">
-                    <div class="scrollspy-wrapper d-flex ${data.episodes.length > 15 ? ' flex-column gap-1' : ' gap-4'}">
+                    <div class="scrollspy-wrapper d-flex ${data.episodes.length > 105 ? ' flex-column gap-1' : ' gap-4'}">
                       <div class="episode-wrapper">
                         <div data-bs-spy="scroll" data-bs-target="#episode-list" data-bs-smooth-scroll="true" class="scrollspy-animeflv">
                           ${Array.from({ length: Math.ceil(data.episodes.length / 7) }, (_, i) => {
@@ -104,7 +104,7 @@
                     
                       ${data.episodes.length > 7 ? `
                         <div class="dot-wrapper">
-                          <div id="episode-list" class="list-group ${data.episodes.length > 15 ? 'episode-column d-flex flex-row flex-wrap' : ''}">
+                          <div id="episode-list" class="list-group ${data.episodes.length > 105 ? 'episode-column d-flex flex-row flex-wrap' : ''}">
                             ${Array.from({ length: Math.ceil(data.episodes.length / 7) }, (_, i) => {
                               const start = i * 7 + 1;
                               const end = Math.min((i + 1) * 7, data.episodes.length);

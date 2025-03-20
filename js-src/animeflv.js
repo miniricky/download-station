@@ -128,9 +128,10 @@
           // Initialize ScrollSpy and tooltips after transition
           extraContainer.addEventListener('transitionend', () => {
             // Initialize ScrollSpy
-            const scrollSpyEl = document.querySelector('[data-bs-spy="scroll"]');
-            bootstrap.ScrollSpy.getOrCreateInstance(scrollSpyEl);
-            scrollSpyEl.addEventListener('activate.bs.scrollspy', (event) => {
+            const desktopTab = container.querySelector('#desktop-tab-pane');
+            const desktopScrollSpyEl = desktopTab.querySelector('[data-bs-spy="scroll"]');
+            bootstrap.ScrollSpy.getOrCreateInstance(desktopScrollSpyEl);
+            desktopScrollSpyEl.addEventListener('activate.bs.scrollspy', (event) => {
               const activeLink = event.relatedTarget;
               if (activeLink) {
                 activeLink.classList.add('active');
@@ -236,15 +237,9 @@
                 synologyTab.appendChild(paragraph);
               }
               else{
-                const item = container.querySelectorAll('#desktop-tab-pane ul li');
-
-                let url = '&title=' + encodeURIComponent(data.title);
-                item.forEach(element => {
-                  url += '&episodes[]=' + encodeURIComponent(element.querySelector('a').textContent);
-                });
-
                 if (data.episodes && data.episodes.length > 0) {
-                  validateEpisodes(url, data.episodes, container);
+                  // Remove url parameter since we're not using it
+                  validateEpisodes(data.episodes, container);
                 } else {
                   const synologyTab = container.querySelector('#synology-tab-pane');
                   synologyTab.innerHTML = '<p>No hay episodios disponibles para este anime.</p>';
@@ -295,87 +290,249 @@
       }
 
       /*
-          * Function for validated if episodes exist.
-          */
-      function validateEpisodes(url, episodes, container) {
-        fetch(`../includes/synology.php?info=verify-episodes${url}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.error) {
-            console.log(data.error);
+       * Function for validated if episodes exist.
+       */
+      function validateEpisodes(episodes, container) {
+        const batchSize = 100;
+        const allEpisodesArray = [];
+        
+        // Process episodes in batches
+        const processBatch = async (startIndex) => {
+          const batchEpisodes = episodes.slice(startIndex, startIndex + batchSize);
+          if (batchEpisodes.length === 0) {
             return;
           }
 
-          var status = false;
-          var episodesArray = [];
-
-          episodes.forEach(episode => { 
-            var filteredEpisodes = data.verify.filter(ep => ep.episode === 'Episodio ' + episode.episode_number);
-
-            if (filteredEpisodes.length !== 0) {
-              status = filteredEpisodes[0].status;
-
-              episodesArray.push({
-                episode: episode.episode_number,
-                link: episode.link,
-                status: status
-              });
-            }
-            else {
-              episodesArray.push({
-                episode: episode.episode_number,
-                link: episode.link,
-                status: 'false'
-              });
-            }
+          let batchUrl = '&title=' + encodeURIComponent(episodes[0].anime_title || '');
+          batchEpisodes.forEach(episode => {
+            batchUrl += '&episodes[]=' + encodeURIComponent('Episodio ' + episode.episode_number);
           });
 
-          const synology = container.querySelector('#synology-tab-pane');
+          try {
+            const response = await fetch(`../includes/synology.php?info=verify-episodes${batchUrl}`);
+            const data = await response.json();
+            
+            if (data.error) {
+              console.log(data.error);
+              return;
+            }
+
+            batchEpisodes.forEach(episode => {
+              const filteredEpisodes = data.verify.filter(ep => ep.episode === 'Episodio ' + episode.episode_number);
+              
+              allEpisodesArray.push({
+                episode: episode.episode_number,
+                link: episode.link,
+                status: filteredEpisodes.length !== 0 ? filteredEpisodes[0].status : 'false'
+              });
+            });
+
+            // Process next batch if there are more episodes
+            if (startIndex + batchSize < episodes.length) {
+              await processBatch(startIndex + batchSize);
+            } else {
+              // All batches processed, now create the UI
+              createSynologyUI(allEpisodesArray, container);
+            }
+          } catch (error) {
+            console.error("Error getting data:", error);
+          }
+        };
+
+        // Start processing from the first batch
+        processBatch(0);
+      }
+
+      /*
+       * Function for create synology UI.
+       */
+      function createSynologyUI(episodesArray, container){
+        const synology = container.querySelector('#synology-tab-pane');
+        const scrollspyWrapper = document.createElement('div');
+        scrollspyWrapper.classList.add('scrollspy-wrapper', 'd-flex');
+        
+        // Fix: Add classes separately
+        if (episodesArray.length > 105) {
+          scrollspyWrapper.classList.add('flex-column');
+          scrollspyWrapper.classList.add('gap-1');
+        } else {
+          scrollspyWrapper.classList.add('gap-4');
+        }
+
+        // Episode wrapper with scrollspy
+        const episodeWrapper = document.createElement('div');
+        episodeWrapper.classList.add('episode-wrapper');
+        
+        const scrollspyContent = document.createElement('div');
+        scrollspyContent.classList.add('scrollspy-animeflv');
+        scrollspyContent.setAttribute('data-bs-spy', 'scroll');
+        scrollspyContent.setAttribute('data-bs-target', '#synology-episode-list');
+        scrollspyContent.setAttribute('data-bs-smooth-scroll', 'true');
+
+        // Group episodes
+        const groupedEpisodes = [];
+        for (let i = 0; i < episodesArray.length; i += 7) {
+          groupedEpisodes.push(episodesArray.slice(i, i + 7));
+        }
+
+        groupedEpisodes.forEach((group, index) => {
+          const groupDiv = document.createElement('div');
+          groupDiv.id = `synology-episode-group-${index + 1}`;
+          groupDiv.classList.add('h-100');
+
           const list = document.createElement('ul');
           list.classList.add('list-group', 'list-group-flush');
 
-          episodesArray.forEach(episode => {
+          group.forEach(episode => {
             const listItem = document.createElement('li');
-            listItem.classList.add('list-group-item', 'item-'+ episode.episode);
+            listItem.classList.add('list-group-item', 'item-' + episode.episode);
 
             if (episode.status === 'false') {
               const anchor = document.createElement('a');
               anchor.classList.add('download-synology');
               anchor.textContent = 'Episodio ' + episode.episode;
               anchor.href = episode.link;
-
-              listItem.appendChild(anchor);              
-            }
-            else {
+              listItem.appendChild(anchor);
+            } else {
               const span = document.createElement('span');
               span.classList.add('text-white');
               span.dataset.bsToggle = 'tooltip';
               span.dataset.bsPlacement = 'top';
               span.setAttribute('title', 'Episodio ya descargado');
               span.textContent = 'Episodio ' + episode.episode;
-
               listItem.appendChild(span);
             }
 
             list.appendChild(listItem);
           });
 
-          synology.appendChild(list);
+          groupDiv.appendChild(list);
+          scrollspyContent.appendChild(groupDiv);
+        });
 
-          container.querySelectorAll('.download-synology').forEach(button => {
-            button.addEventListener('click', function(e) {
-              e.preventDefault();
-              const url = this.getAttribute('href');
-              const episode = this.textContent;
-              const item = this.closest('.list-group-item').classList[1];
-              const title = this.closest('.text').querySelector('h2').textContent;
-              scrapingStreamtape(url, title, episode, item, 'synology');
+        episodeWrapper.appendChild(scrollspyContent);
+        scrollspyWrapper.appendChild(episodeWrapper);
+
+        // Add dots navigation if more than 7 episodes
+        if (episodesArray.length > 7) {
+          const dotWrapper = document.createElement('div');
+          dotWrapper.classList.add('dot-wrapper');
+
+          const episodeList = document.createElement('div');
+          episodeList.id = 'synology-episode-list';
+          episodeList.classList.add('list-group');
+          if (episodesArray.length > 105) {
+            episodeList.classList.add('episode-column', 'd-flex', 'flex-row', 'flex-wrap');
+          }
+
+          groupedEpisodes.forEach((_, index) => {
+            const start = index * 7 + 1;
+            const end = Math.min((index + 1) * 7, episodesArray.length);
+            
+            const link = document.createElement('a');
+            link.classList.add('list-group-item', 'list-group-item-action', 'custom-tooltip');
+            link.href = `#synology-episode-group-${index + 1}`;
+            link.dataset.bsToggle = 'tooltip';
+            link.dataset.bsPlacement = episodesArray.length > 105 ? 'bottom' : 'right';
+            link.dataset.bsCustomClass = 'custom-tooltip';
+            link.dataset.bsTitle = `Episodios del ${start} - ${end}`;
+            link.textContent = `Episodios ${start}-${end}`;
+
+            episodeList.appendChild(link);
+          });
+
+          // Initialize tooltips after appending to DOM
+          const tooltipTriggerList = episodeList.querySelectorAll('[data-bs-toggle="tooltip"]');
+          [...tooltipTriggerList].forEach(tooltipTriggerEl => {
+            const tooltip = new bootstrap.Tooltip(tooltipTriggerEl, {
+              trigger: 'manual',
+              boundary: 'window',
+              placement: episodesArray.length > 105 ? 'bottom' : 'right',
+              popperConfig: episodesArray.length > 105 ? {
+                modifiers: [
+                  {
+                    name: 'computeStyles',
+                    options: {
+                      adaptive: false
+                    }
+                  },
+                  {
+                    name: 'preventOverflow',
+                    options: {
+                      boundary: 'window'
+                    }
+                  },
+                  {
+                    name: 'applyStyles',
+                    fn: ({ state }) => {
+                      if (state.elements.popper) {
+                        const episodeList = document.querySelector('#synology-episode-list');
+                        if (episodeList && episodeList.classList.contains('episode-column')) {
+                          const rect = episodeList.getBoundingClientRect();
+                          Object.assign(state.elements.popper.style, {
+                            position: 'fixed',
+                            top: `${rect.bottom}px`,
+                            left: `${rect.left}px`,
+                            transform: 'none'
+                          });
+                        }
+                      }
+                    }
+                  }
+                ]
+              } : null
+            });
+
+            // Show tooltip if initially active
+            if (tooltipTriggerEl.classList.contains('active')) {
+              tooltip.show();
+            }
+
+            // Handle class changes
+            const observer = new MutationObserver(() => {
+              const isActive = tooltipTriggerEl.classList.contains('active');
+              if (isActive && !tooltip._isShown()) {
+                tooltip.show();
+              } else if (!isActive && tooltip._isShown()) {
+                tooltip.hide();
+              }
+            });
+
+            observer.observe(tooltipTriggerEl, {
+              attributes: true,
+              attributeFilter: ['class']
             });
           });
 
-        })
-        .catch(error => {
-          console.error("Error getting data:", error);
+          dotWrapper.appendChild(episodeList);
+          scrollspyWrapper.appendChild(dotWrapper);
+        }
+
+        synology.appendChild(scrollspyWrapper);
+
+        // Initialize ScrollSpy when tab is shown
+        const synologyTab = document.querySelector('#synology-tab');
+        synologyTab.addEventListener('shown.bs.tab', () => {
+          const synologyScrollSpyEl = synology.querySelector('[data-bs-spy="scroll"]');
+          
+          if (synologyScrollSpyEl) {
+            // Dispose existing instance if any
+            const existingScrollSpy = bootstrap.ScrollSpy.getInstance(synologyScrollSpyEl);
+            if (existingScrollSpy) {
+              existingScrollSpy.dispose();
+            }
+            
+            const scrollSpy = new bootstrap.ScrollSpy(synologyScrollSpyEl, {
+              target: '#synology-episode-list'
+            });
+            
+            synologyScrollSpyEl.addEventListener('activate.bs.scrollspy', (event) => {
+              const activeLink = event.relatedTarget;
+              if (activeLink) {
+                activeLink.classList.add('active');
+              }
+            });
+          }
         });
       }
 

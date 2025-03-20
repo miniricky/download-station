@@ -161,7 +161,8 @@
               }
 
               .dot-wrapper{
-                #episode-list{
+                #episode-list,
+                #synology-episode-list{
                   text-indent: -99999999px;
                   display: flex;
                   gap: 5px;

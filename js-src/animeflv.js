@@ -90,9 +90,7 @@
                                 <ul class="list-group list-group-flush">
                                   ${groupEpisodes.map(ch => `
                                     <li class="list-group-item">
-                                      <a class="download-desktop" href="${ch.link}" target="_blank">
-                                        Episodio ${ch.episode_number}
-                                      </a>
+                                      <a class="download-desktop" href="${ch.link}" target="_blank">Episodio ${ch.episode_number}</a>
                                     </li>
                                   `).join('')}
                                 </ul>
@@ -110,7 +108,7 @@
                               const end = Math.min((i + 1) * 7, data.episodes.length);
                               return `
                                 <a class="list-group-item list-group-item-action custom-tooltip" href="#episode-group-${i + 1}" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip" data-bs-title="Episodios del ${start} - ${end}">
-                                  Episodes ${start}-${end}
+                                  Episodios ${start}-${end}
                                 </a>
                               `;
                             }).join('')}
@@ -343,7 +341,7 @@
             if (episode.status === 'false') {
               const anchor = document.createElement('a');
               anchor.classList.add('download-synology');
-              anchor.textContent = 'Episode ' + episode.episode;
+              anchor.textContent = 'Episodio ' + episode.episode;
               anchor.href = episode.link;
 
               listItem.appendChild(anchor);              
@@ -354,7 +352,7 @@
               span.dataset.bsToggle = 'tooltip';
               span.dataset.bsPlacement = 'top';
               span.setAttribute('title', 'Episodio ya descargado');
-              span.textContent = 'Episode ' + episode.episode;
+              span.textContent = 'Episodio ' + episode.episode;
 
               listItem.appendChild(span);
             }

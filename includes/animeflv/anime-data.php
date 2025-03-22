@@ -22,6 +22,7 @@ function getAnimeDetails($pdo, $anime_id) {
         a.synopsis, 
         a.type, 
         a.status,
+        a.calendar,
         GROUP_CONCAT(DISTINCT g.genre ORDER BY g.genre ASC) AS genres
     FROM animes a
     LEFT JOIN anime_genres g ON a.id = g.anime_id

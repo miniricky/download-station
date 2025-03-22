@@ -70,7 +70,8 @@ try {
   $total_pages = ceil($total_rows / $items_per_page);
 
   // Main query
-  $sql = "SELECT DISTINCT animes.*, sites.name AS site_name, sites.url AS site_url
+  $sql = "SELECT DISTINCT animes.*, sites.name AS site_name, sites.url AS site_url,
+          (SELECT COUNT(*) FROM anime_episodes WHERE anime_id = animes.id) as episode_count
           FROM animes
           JOIN sites ON animes.site_id = sites.id
           WHERE $where_clause
@@ -92,11 +93,12 @@ try {
     foreach ($animes as $anime) {
       $content .= '<div class="anime-wrapper col-6 col-md-3 col-lg-4 col-xl-3">';
       $content .= '<div class="anime" id="' . $anime['id'] . '">';
-      $content .= '<div class="image"><img src="' . $anime['image_url'] . '" width="100"></div>';
+      $content .= '<div class="image"><img src="' . $anime['image_url'] . '" width="100">';
+      $content .= '<span>' . $anime['episode_count'] . ' eps</span></div>';
       $content .= '<div class="status"><span class="type">' . $anime['type'] . '</span>';
       $content .= '<span class="type">' . $anime['status'] . '</span></div>';
       $content .= '<div class="text"><h2 class="h6">' . $anime['title'] . '</h2></div>';
-      $content .= '<button type="button" class="btn btn-link viewEpisodes">Episodes</button>';
+      $content .= '<button type="button" class="btn btn-link viewEpisodes">Episodios</button>';
       $content .= "</div></div>";
     }
   } else {

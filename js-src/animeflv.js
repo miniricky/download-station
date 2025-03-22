@@ -36,7 +36,6 @@
         const extraContainer = document.createElement('div');
         extraContainer.classList.add('anime-detail', 'col-12');
         extraContainer.setAttribute('data-anime-id', animeID);
-        extraContainer.textContent = 'Extra Container';
 
         if (insertIndex < allAnimeWrappers.length) {
           animeContainer.insertBefore(extraContainer, allAnimeWrappers[insertIndex], { preventScroll: true });
@@ -121,6 +120,7 @@
                     ${window.loginForm}
                   </div>
                 </div>
+                ${data.calendar ? `<p><small>Siguiente capítulo el ${new Date(data.calendar).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</small></p>` : ''}
               </div>
             </div>
           `;

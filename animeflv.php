@@ -218,13 +218,13 @@
               $total_rows = $count_stmt->fetch(PDO::FETCH_ASSOC)['total'];
               $total_pages = ceil($total_rows / $items_per_page);
       
-              // Modify main query
-              $sql = "SELECT DISTINCT animes.*, sites.name AS site_name, sites.url AS site_url
+              $sql = "SELECT DISTINCT animes.*, sites.name AS site_name, sites.url AS site_url,
+                      (SELECT COUNT(*) FROM anime_episodes WHERE anime_id = animes.id) as episode_count
                       FROM animes
                       JOIN sites ON animes.site_id = sites.id
                       WHERE $where_clause
                       LIMIT :limit OFFSET :offset";
-              
+      
               $stmt = $pdo->prepare($sql);
               foreach ($params as $key => $value) {
                 $stmt->bindValue($key, $value);
@@ -239,7 +239,8 @@
                 foreach ($animes as $anime) {
                   echo '<div class="anime-wrapper col-6 col-md-3 col-lg-4 col-xl-3">';
                   echo '<div class="anime" id="' . $anime['id']  . '">';  
-                  echo '<div class="image"><img src="' . $anime['image_url'] . '" width="100"></div>';
+                  echo '<div class="image"><img src="' . $anime['image_url'] . '" width="100">';
+                  echo '<span>' . $anime['episode_count'] . ' eps</span></div>';
                   echo '<div class="status"><span class="type">' . $anime['type'] . '</span>';
                   echo '<span class="type">' . $anime['status'] . '</span></div>';
                   echo '<div class="text">';

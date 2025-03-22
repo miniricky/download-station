@@ -1,10 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="">
+  <meta name="description" content="Descarga tus animes y películas favoritas de diferentes fuentes en un solo lugar.">
+  <meta name="keywords" content="descargar anime, descargar películas, anime online, streaming anime, animeflv, películas online">
+  <meta name="author" content="Download Station">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:title" content="Download Station - Tu Centro de Descargas de Anime">
+  <meta property="og:description" content="Descarga tus animes y películas favoritas de diferentes fuentes en un solo lugar.">
+  <meta property="og:image" content="">
+  <meta property="og:url" content="https://download-station.com">
+
+  <link rel="canonical" href="https://download-station.com">
   <title>Download Station</title>
 
   <link href="./css/style.min.css" rel="stylesheet">
@@ -24,7 +35,7 @@
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Sitios
+              Animes
             </a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="/animeflv.php">AnimeFlV</a></li>
@@ -36,7 +47,8 @@
   </nav>
   <div class="section-row bg-purple-dark" id="hero">
     <div class="container-fluid">
-      <h1>Download Station</h1>
+      <h1 class="title">Download Station</h1>
+
       <p>Bienvenido a tu plataforma centralizada de descargas de anime, donde podrás explorar nuestra extensa colección de AnimeFLV y otras fuentes populares. Accede y gestiona los episodios de descarga de tus series de anime favoritas directamente en tu ordenador o Synology NAS. Tanto si creas una biblioteca personal como si configuras tu servidor multimedia, te ofrecemos una experiencia de descarga fluida con descargas directas e integración con Synology Download Station. Sencillo, eficiente y organizado: todo lo que necesitas en un solo lugar.</p>
     </div>
 

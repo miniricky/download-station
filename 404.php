@@ -1,11 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
-  <title>Download Station</title>
+  <meta name="keywords" content="">
+  <meta name="author" content="">
+  <meta name="robots" content="">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:title" content="">
+  <meta property="og:description" content="">
+  <meta property="og:image" content="">
+  <meta property="og:url" content="">
+
+  <link rel="canonical" href="">
+  <title></title>
 
   <link href="./css/style.min.css" rel="stylesheet">
 </head>
@@ -24,7 +35,7 @@
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Sitios
+              Animes
             </a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="/animeflv.php">AnimeFlV</a></li>

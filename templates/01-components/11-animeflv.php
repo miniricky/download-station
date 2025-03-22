@@ -5,8 +5,6 @@
     $items_per_page = 24;
   ?>
   <div class="container-fluid">
-    <h1 class="title">AnimeFLV</h1>
-
     <div class="row row-30 flex-lg-row-reverse">
       <div class="sidebar col-12 col-lg-4 col-xl-3">
         <div class="sticky-lg-top">
@@ -213,7 +211,9 @@
                   echo '<div class="anime-wrapper col-6 col-md-3 col-lg-4 col-xl-3">';
                   echo '<div class="anime" id="' . $anime['id']  . '">';  
                   echo '<div class="image"><img src="' . $anime['image_url'] . '" width="100">';
-                  echo '<span>' . $anime['episode_count'] . ' eps</span></div>';
+                  echo '<span class="episodes">' . $anime['episode_count'] . ' eps</span>';
+                  echo '<span class="language">Japones</span>';
+                  echo '<span class="subtitles">Español Subtitulado</span></div>';
                   echo '<div class="status"><span class="type">' . $anime['type'] . '</span>';
                   echo '<span class="type">' . $anime['status'] . '</span></div>';
                   echo '<div class="text">';

@@ -1,5 +1,24 @@
+{% set page = {
+  title: 'AnimeFLV - Download Station',
+  description: 'Descarga y gestiona tus animes favoritos desde AnimeFLV. Accede a una amplia biblioteca de series de anime con descargas directas.',
+  keywords: 'animeflv, descargar anime, anime en español, anime online, streaming anime, episodios de anime, series anime',
+  author: 'Download Station',
+  ogTitle: 'AnimeFLV - Descarga Anime en Español | Download Station',
+  ogDescription: 'Descarga tus animes favoritos desde AnimeFLV. Gestiona y descarga episodios directamente a tu dispositivo o NAS.',
+  ogImage: '/images/animeflv.png',
+  canonical: 'https://download-station.com/animeflv.php',
+  robots: 'index, follow',
+  lang: 'es'
+} %}
 {% include '../templates/00-globals/00-start.php' %}
   {% include '../templates/00-globals/01-header.php' %}
+  {% include '../templates/00-globals/00-start.php' with page %}
+  {% set hero = {
+    title: 'AnimeFLV',
+    title_align: ' text-center',
+    description: '',
+  }%}
+  {% include '../templates/01-components/02-hero.php' with hero %}
   {% include '../templates/01-components/11-animeflv.php' %}
   {% include '../templates/01-components/90-sid-modal.php' %}
   {% include '../templates/01-components/91-toast.php' %}

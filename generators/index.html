@@ -1,6 +1,23 @@
-{% include '../templates/00-globals/00-start.php' %}
+{% set page = {
+  title: 'Download Station',
+  description: 'Descarga tus animes y películas favoritas de diferentes fuentes en un solo lugar.',
+  keywords: 'descargar anime, descargar películas, anime online, streaming anime, animeflv, películas online',
+  author: 'Download Station',
+  ogTitle: 'Download Station - Tu Centro de Descargas de Anime',
+  ogDescription: 'Descarga tus animes y películas favoritas de diferentes fuentes en un solo lugar.',
+  ogImage: '',
+  canonical: 'https://download-station.com',
+  robots: 'index, follow',
+  lang: 'es'
+} %}
+{% include '../templates/00-globals/00-start.php' with page %}
   {% include '../templates/00-globals/01-header.php' %}
-  {% include '../templates/01-components/02-hero.php' %}
+  {% set hero = {
+    title: 'Download Station',
+    title_align: '',
+    description: 'Bienvenido a tu plataforma centralizada de descargas de anime, donde podrás explorar nuestra extensa colección de AnimeFLV y otras fuentes populares. Accede y gestiona los episodios de descarga de tus series de anime favoritas directamente en tu ordenador o Synology NAS. Tanto si creas una biblioteca personal como si configuras tu servidor multimedia, te ofrecemos una experiencia de descarga fluida con descargas directas e integración con Synology Download Station. Sencillo, eficiente y organizado: todo lo que necesitas en un solo lugar.'
+  }%}
+  {% include '../templates/01-components/02-hero.php' with page %}
   {% include '../templates/01-components/03-site-cards.php' %}
   {% include '../templates/00-globals/98-footer.php' %}
 {% include '../templates/00-globals/99-end.php' %}

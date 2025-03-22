@@ -174,7 +174,7 @@
                             Object.assign(state.elements.popper.style, {
                               position: 'fixed',
                               top: `${rect.bottom}px`,
-                              left: `${rect.left}px`,
+                              left: `${rect.right - state.elements.popper.offsetWidth}px`,
                               transform: 'none'
                             });
                           }
